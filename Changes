@@ -1,5 +1,8 @@
 Revision history for Perl module PDF::Template
 
+0.18 Thu Apr 08 07:30:00 2004
+    - Fixed bug regarding empty arrays as loop variables
+
 0.17 Wed Mar 17 12:00:00 2003
     - Fixed bug introduced in 0.16 (loop parameters weren't case-insensitive)
 
