@@ -1,5 +1,9 @@
 Revision history for Perl module PDF::Template
 
+0.12 Tue Dec 16 09:30:00 2003
+    - Fixed bug with HEADERs not appearing where appropriate when
+      PAGE_SIZE option is chosen.
+
 0.11 Fri Dec 07 17:00:00 2003
     - Makefile.PL has two changes:
         - <> => <STDIN>

@@ -40,12 +40,12 @@ sub find_margin_heights
         if ($obj->isa('HEADER'))
         {
             die "Cannot have two <header> tags in the same <pagedef>", $/ if defined $header_height;
-            $header_height = int($context->get($obj, 'HEADER_HEIGHT') + 0.499);
+            $header_height = $context->get($obj, 'HEADER_HEIGHT');
         }
         elsif ($obj->isa('FOOTER'))
         {
             die "Cannot have two <footer> tags in the same <pagedef>", $/ if defined $footer_height;
-            $footer_height = int($context->get($obj, 'FOOTER_HEIGHT') + 0.499);
+            $footer_height = $context->get($obj, 'FOOTER_HEIGHT');
         }
         else
         {
@@ -63,20 +63,7 @@ sub find_margin_heights
     return ($header_height, $footer_height);
 }
 
-sub begin_page
-{
-    my $self = shift;
-    my ($context) = @_;
-
-    $context->{X} = 0;
-    $context->{Y} = $context->get($self, 'START_Y');
-
-    $context->reset_pagebreak;
-
-    return $self->SUPER::begin_page($context);
-}
-
-sub render
+sub enter_scope
 {
     my $self = shift;
     my ($context) = @_;
@@ -99,10 +86,45 @@ sub render
     if ($context->get($self, 'LANDSCAPE'))
     {
         ($pheight, $pwidth) = ($pwidth, $pheight);
-        ($self->{PAGE_HEIGHT}, $self->{PAGE_WIDTH})
-            = ($orig_width, $orig_height)
+
+        @{$self}{qw(PAGE_HEIGHT PAGE_WIDTH)}
+            = @{$self}{qw(_ORIG_HEIGHT _ORIG_WIDTH)}
             = ($self->{PAGE_WIDTH}, $self->{PAGE_HEIGHT});
     }
+
+    return $self->SUPER::enter_scope($context);
+}
+
+sub exit_scope
+{
+    my $self = shift;
+    my ($context) = @_;
+
+    @{$self}{qw(PAGE_HEIGHT PAGE_WIDTH)} = delete @{$self}{qw(_ORIG_HEIGHT _ORIG_WIDTH)}
+        if exists $self->{_ORIG_HEIGHT};
+
+    $self->SUPER::exit_scope($context);
+}
+
+sub begin_page
+{
+    my $self = shift;
+    my ($context) = @_;
+
+    $context->{X} = 0;
+    $context->{Y} = $context->get($self, 'START_Y');
+
+    $context->reset_pagebreak;
+
+    return $self->SUPER::begin_page($context);
+}
+
+sub render
+{
+    my $self = shift;
+    my ($context) = @_;
+
+    my ($pheight, $pwidth) = map { $context->get($self, $_) } qw(PAGE_HEIGHT PAGE_WIDTH);
 
     my ($header_h, $footer_h) = $self->find_margin_heights($context);
     $self->{START_Y} = $pheight - $header_h;
@@ -113,7 +135,6 @@ sub render
     my $done = 0;
     while (!$done)
     {
-        $self->enter_scope($context);
         $self->begin_page($context);
 
         pdflib_pl::PDF_begin_page($context->{PDF}, $pwidth, $pheight);
@@ -123,13 +144,9 @@ sub render
         pdflib_pl::PDF_end_page($context->{PDF});
 
         $self->end_page($context);
-        $self->exit_scope($context);
 
         $context->increment_pagenumber unless $context->get($self, 'NOPAGENUMBER');
     }
-
-    ($self->{PAGE_WIDTH}, $self->{PAGE_HEIGHT}) = ($orig_width, $orig_height)
-        if defined $orig_width;
 
     return $done;
 }
@@ -199,7 +216,7 @@ None
 =head1 NOTE
 
 It is very possible, and often useful, to have more than one pagedef in a given
-template. Also, the PAGEDEF does not have to be the direct child of the 
+template. Also, the PAGEDEF does not have to be the direct child of the
 PDFTEMPLATE node. It is sometimes useful to have something like:
 
   <pdftemplate>

@@ -17,7 +17,7 @@ sub enter_scope
     @{$self}{qw/OLD_X OLD_Y/} = map { $context->get($self, $_) } qw(X Y);
 
     $context->{X} = 0;
-    $context->{Y} = $context->resolve($self, 'PAGE_HEIGHT');
+    $context->{Y} = $context->get($self, 'PAGE_HEIGHT');
 
     return $self->SUPER::enter_scope($context);
 }
