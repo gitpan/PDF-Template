@@ -1,0 +1,2 @@
+PDF::Template is a layout system that creates Adobe PDF files from the same
+data structure used by HTML::Template.

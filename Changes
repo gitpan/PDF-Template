@@ -1,40 +1,9 @@
-Revision history for Perl extension PDF::Template.
+Revision history for Perl module PDF::Template
 
-0.01  Wed Feb 13 15:31:36 2002
-   - original version; created by h2xs 1.19
-0.02  Mon Mar 3 16:44:00 2002
-   - Swapped LMARGIN and RMARGIN (they were backwards)
-   - Adding the "always" concept, clarifying when things are rendered
-   - More test cases, which double as examples
-0.03
-   - Rolf Beutner - Text color
-   - Robert Graff - US Paper sizes
-   - Christian Frantsen - Add width parameter for <line>
-   - Cleaned up test 2 (t2.xml)
-   - New test cases
-0.04
-   - Fixed bug in get_buffer().  Thanks Marco!
-   - makefile.pl now checks for pdflif_pl.pm installed
-0.05 Mon Jul 8 2002
-   - Added missing test file to manifest
-   - determine image type from file extension if it wasn't passed in (Mike Andreev)
-   - Chg required version of pdflib  to 4.0 (necessary for PDF_setcolor)
-   - Added <circle> object (thanks Andy Thaller)   
-   - bug fix for __FIRST__
-   - Adding operators to conditional
-   - Adding all sorts of image justification stuff (not sure it works yet though)
-   - Adding image border
-   - Added unicode support (not tested yet)
-   - Adding support for external fonts
-   - bug fix for images rendering when they shouldn't
-   - Added image test
-   - Added conditional test
-   - Added font test
-     The font test uses impact.ttf.  I grabbed this off of a website, it is probably
-     not legal for me to include it.  I'll find a free truetype font soon to replace
-     it with.     
-   - Fixed bug with <page-break> that wasn't in a loop
-   - Fixed bug with multiple top level <loop>   
-   
-   - thanks to Mike Andreev for many of the enhancements this version
+0.10 Fri Nov 30 17:00:00 2003
+    - Wholescale changes to the underlying structure
+    - Addition of a concept of scope, allowing for relative positioning
+    - Support for CJK fonts
+    - Maintenance fixes
+    - Turnover of maintenance from David Ferrance to Rob Kinyon
 
