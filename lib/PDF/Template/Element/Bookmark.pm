@@ -85,7 +85,7 @@ That now adds a bookmark for that spot to the PDF, called "Some Bookmark".
 
 =head1 AUTHOR
 
-Rob Kinyon (rkinyon@columbus.rr.com)
+Rob Kinyon (rob.kinyon@gmail.com)
 
 =head1 SEE ALSO
 

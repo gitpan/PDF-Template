@@ -233,7 +233,7 @@ PDFTEMPLATE node. It is sometimes useful to have something like:
 
 =head1 AUTHOR
 
-Rob Kinyon (rkinyon@columbus.rr.com)
+Rob Kinyon (rob.kinyon@gmail.com)
 
 =head1 SEE ALSO
 

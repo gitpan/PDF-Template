@@ -160,7 +160,7 @@ top to the spot 3" from the left and 2" from the top.
 
 =head1 AUTHOR
 
-Rob Kinyon (rkinyon@columbus.rr.com)
+Rob Kinyon (rob.kinyon@gmail.com)
 
 =head1 SEE ALSO
 

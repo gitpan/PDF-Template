@@ -123,7 +123,7 @@ The children will be rendered on the same page, if at all possible.
 
 =head1 AUTHOR
 
-Rob Kinyon (rkinyon@columbus.rr.com)
+Rob Kinyon (rob.kinyon@gmail.com)
 
 =head1 SEE ALSO
 

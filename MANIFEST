@@ -13,7 +13,7 @@ lib/PDF/Template/Context.pm
 lib/PDF/Template/Element.pm
 lib/PDF/Template/Factory.pm
 lib/PDF/Template/Iterator.pm
-lib/PDF/Template/TextObject.pm_
+lib/PDF/Template/TextObject.pm
 lib/PDF/Template/Container/Always.pm
 lib/PDF/Template/Container/Conditional.pm
 lib/PDF/Template/Container/Font.pm
@@ -32,10 +32,9 @@ lib/PDF/Template/Element/HorizontalRule.pm
 lib/PDF/Template/Element/Image.pm
 lib/PDF/Template/Element/Line.pm
 lib/PDF/Template/Element/PageBreak.pm
-lib/PDF/Template/Element/TextBox.pm_
+lib/PDF/Template/Element/TextBox.pm
 lib/PDF/Template/Element/Var.pm
 lib/PDF/Template/Element/Weblink.pm
-examples/report.xml
 t/001_load.t
 t/002_simple.t
 t/003_basic.t
@@ -51,4 +50,5 @@ t/templates/002_3/xml.txt
 t/templates/003_1/buffer.txt
 t/templates/003_1/vars.txt
 t/templates/003_1/xml.txt
+t/pdflib_pl.pm
 META.yml                                 Module meta-data (added by MakeMaker)

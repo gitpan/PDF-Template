@@ -6,7 +6,7 @@ BEGIN {
     use PDF::Template::Base;
     use vars qw ($VERSION @ISA);
 
-    $VERSION = '0.19';
+    $VERSION = '0.20';
     @ISA     = qw (PDF::Template::Base);
 }
 
@@ -36,7 +36,7 @@ sub new
     $self->{PARAM_MAP} = {} unless UNIVERSAL::isa($self->{PARAM_MAP}, 'HASH');
 
     $self->{PDF_VERSION} = 0;
-    for my $version (reverse 1 .. 5)
+    for my $version (reverse 1 .. 6)
     {
         eval "UNIVERSAL::VERSION('pdflib_pl', $version.0)";
         unless ($@)

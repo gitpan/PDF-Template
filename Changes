@@ -1,5 +1,9 @@
 Revision history for Perl module PDF::Template
 
+0.20 Thu Dec 02 10:30:00 2004
+    - Fixed tests so that they run correctly
+    - Fixed Makefile.PL to generate Unicode-question correctly
+
 0.18 Thu Apr 08 07:30:00 2004
     - Fixed bug regarding empty arrays as loop variables
 
