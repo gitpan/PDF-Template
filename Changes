@@ -12,3 +12,6 @@ Revision history for Perl extension PDF::Template.
    - Christian Frantsen - Add width parameter for <line>
    - Cleaned up test 2 (t2.xml)
    - New test cases
+0.04
+   - Fixed bug in get_buffer().  Thanks Marco!
+   - makefile.pl now checks for pdflif_pl.pm installed

@@ -17,7 +17,7 @@ require Exporter;
 @EXPORT = qw(
    
 );
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 sub debug
 {
@@ -148,9 +148,10 @@ sub get_buffer
 
    $self->_prepare_output($p);
 
-   my $buf = PDF_get_buffer($p);
 
    PDF_close($p);
+
+   my $buf = PDF_get_buffer($p);
    
    $buf;
 }
