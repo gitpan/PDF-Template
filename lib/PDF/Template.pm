@@ -6,7 +6,7 @@ BEGIN {
     use PDF::Template::Base;
     use vars qw ($VERSION @ISA);
 
-    $VERSION = 0.14;
+    $VERSION = 0.15;
     @ISA     = qw (PDF::Template::Base);
 }
 

@@ -1,5 +1,8 @@
 Revision history for Perl module PDF::Template
 
+0.15 Tue Mar 16 12:00:00 2003
+    - Fixed bug w/using the same image in more than one <image> tag
+
 0.13 Tue Jan 20 12:30:00 2003
     - Fixed bug IMAGE tag (caused by ..::Font::begin_page() not calling SUPER)
     - Added Base to allow for external entities to be referenced by filename
