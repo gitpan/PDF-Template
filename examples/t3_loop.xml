@@ -1,0 +1,41 @@
+<pdftemplate name="test">
+
+  <pagedef pagesize="A4" landscape='1'>
+
+   <always>
+      <font size="24" face="Times-Italic"/>
+      <textbox x="50" y="550" w="760" h="25" border='1' size="24" justify="center">This is a title.</textbox>
+
+      <!-- Table Header -->
+
+      <font size="18" face="Times-Bold"/>
+      <row h='25' y='475'>
+         <textbox bgcolor='200,200,200' w="200" h='25' x='50'  border='1' justify='center'>Last Name</textbox>
+         <textbox bgcolor='200,200,200' w="200" h='25' x='250'  border='1' justify='center'>First Name</textbox>
+         <textbox bgcolor='200,200,200' w="200" h='25' x='450'  border='1' justify='right'>A Number</textbox>
+      </row>
+   </always>
+
+   <font size="14" face="Times-Italic"/>
+
+   <loop x='50' w='400' y='450' y2='120' name='DATA'>
+      
+      <row h='25'>
+         <textbox w="200" h='25' x='50'  border='1' justify='center'><var name='LNAME'/></textbox>
+         <textbox w="200" h='25' x='250'  border='1' justify='center'><var name='FNAME'/></textbox>
+         <textbox w="200" h='25' x='450'  border='1' justify='right' rmargin='10'><var name='VAL'/></textbox>
+      </row>
+      
+   </loop>
+
+   <!-- This is the footer.  It is in an always block so that it will appear
+        on every page, not just the one after the lop ends.
+     -->
+     
+   <always>
+      <textbox x="700" y="50" w="50" h="20">Page <var name="__PAGE__"/></textbox>
+   </always>
+   
+</pagedef>
+
+</pdftemplate>

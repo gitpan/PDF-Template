@@ -17,7 +17,12 @@ require Exporter;
 @EXPORT = qw(
    
 );
-$VERSION = '0.01';
+$VERSION = '0.02';
+
+sub debug
+{
+   print @_;
+}
 
 
 #
@@ -29,7 +34,8 @@ $VERSION = '0.01';
 # TODO should be ::Container::Pagedef
 # loop maxiters
 # PDF_set_info - find out more about this
-#
+# Need to make ALREADYDONE as clear as PENDINGBREAK is
+#   - Added loop variable __PAGEFIRST__
 # Providers - I need to create some provider classes that abstract
 #   the process of PDF creation.  This will enable PDF::Template to
 #   work with different PDF providers.  A provider could be passed
@@ -317,10 +323,23 @@ sub render
 
    my $notdone = 1;
    
+   my $max_elem = -1;  # Highest succesfully rendered element
+   
    while ($notdone)
    {
       $notdone = 0;
 
+      # Pendingbreak gets set to 1 when we hit a page break.
+      $r_handles->{PENDINGBREAK} = 0;
+
+      # ALREADY_DONE gets set to 1 when we are redinering elements
+      # that have already be rendered.  This happens after a page
+      # break.  If an element is not in an always block, it should 
+      # see that ALREADYY_DONE is set and not render itself.  ALWAYS
+      # blocks should render regardless.
+      
+      $r_handles->{ALREADY_DONE} = 1;
+      
       my $ref_fonts = $r_handles->{FONTS};   
 
       $self->_begin_page($p,$r_handles);
@@ -336,9 +355,27 @@ sub render
       }
 
 
+      my $cur_elem = 0;
+      
       for $er ( @{$self->{ELEMENTS}} )
       {
+         if ($cur_elem >= $max_elem)
+         {
+            $r_handles->{ALREADY_DONE} = 0;
+         }
+         
          $notdone += $er->render($p,$r_handles);
+
+         if ($notdone)
+         {
+            $r_handles->{PENDINGBREAK} = 1;
+         }
+         # If successful, keep track of this fact
+         elsif ($cur_elem > $max_elem)
+         {
+            $max_elem = $cur_elem;
+         }
+         $cur_elem ++;
       }
 
       $self->_end_page($p,$r_handles);
@@ -506,41 +543,45 @@ sub _parse_xml
       {
          $t = PDF::Template::Element::TextBox->new(%{$href});
       }
-      if ($tag eq 'IMAGE')
+      elsif ($tag eq 'IMAGE')
       {
          $t = PDF::Template::Element::Image->new(%{$href});
       }
-      if ($tag eq 'FONT')
+      elsif ($tag eq 'FONT')
       {
          $t = PDF::Template::Element::Font->new(%{$href});
       }
-      if ($tag eq 'LINE')
+      elsif ($tag eq 'LINE')
       {
          $t = PDF::Template::Element::Line->new(%{$href});
       }
-      if ($tag eq 'LOOP')
+      elsif ($tag eq 'LOOP')
       { 
          $t = PDF::Template::Container::Loop->new(%{$href});
       }
-      if ($tag eq 'ROW')
+      elsif ($tag eq 'ROW')
       {
          $t = PDF::Template::Container::Row->new(%{$href});
       }
-      if ($tag eq 'IF')
+      elsif ($tag eq 'IF')
       {
          $t = PDF::Template::Container::Conditional->new(%{$href});
       }
-      if ($tag eq 'PAGE-BREAK')
+      elsif ($tag eq 'PAGE-BREAK')
       {
          $t = PDF::Template::Element::PageBreak->new(%{$href});
       }
-      if ($tag eq 'BOOKMARK')
+      elsif ($tag eq 'BOOKMARK')
       {
          $t = PDF::Template::Element::Bookmark->new(%{$href});
       }
-      if ($tag eq 'POS')
+      elsif ($tag eq 'POS')
       {
          $t = PDF::Template::Element::Pos->new(%{$href});
+      }
+      elsif ($tag eq 'ALWAYS')
+      {
+         $t = PDF::Template::Container::Always->new(%{$href});
       }
       
       
@@ -675,6 +716,13 @@ sub render
 {
    my ($self,$p, $r_handles) = @_;
 
+   if ($r_handles->{PENDINGBREAK})
+   {
+      return 1;
+   }
+
+   if ($r_handles->{ALREADY_DONE}) { return 0; }
+
    my $ref_fonts     = $r_handles->{FONTS};
    my $ref_param_map = $r_handles->{PARAM_MAP};
 
@@ -717,15 +765,15 @@ sub render
       pdflib_pl::PDF_stroke($p);
    }
 
-   if (defined($self->{RMARGIN}))
-   {
-      $x += $self->{RMARGIN};
-      $w -= $self->{RMARGIN};
-   }
-   
    if (defined($self->{LMARGIN}))
    {
+      $x += $self->{LMARGIN};
       $w -= $self->{LMARGIN};
+   }
+   
+   if (defined($self->{RMARGIN}))
+   {
+      $w -= $self->{RMARGIN};
    }
 
    # OK, print that
@@ -832,6 +880,12 @@ sub render
 {
    my ($self,$p, $r_handles) = @_;
 
+
+   if ($r_handles->{PENDINGBREAK})
+   {
+      return 1;
+   }
+   
    my $face = $self->{FACE};
    my $size = $self->{SIZE};
    my $ref_fonts = $r_handles->{FONTS};
@@ -868,6 +922,11 @@ sub new
 sub render
 {
    my ($self,$p, $r_handles) = @_;
+
+   if ($r_handles->{PENDINGBREAK})
+   {
+      return 1;
+   }
 
    pdflib_pl::PDF_setlinewidth($p,1);
    pdflib_pl::PDF_moveto($p,$self->{X1},$self->{Y1});
@@ -1028,6 +1087,11 @@ sub new
 sub render
 {
    my ($self,$p, $r_handles) = @_;
+
+   if ($r_handles->{PENDINGBREAK})
+   {
+      return 1;
+   }
 
    my $txt = $self->{TXTOBJ}->resolve($r_handles);
    my $i = $r_handles->{IMAGES}->{$txt};
@@ -1364,6 +1428,47 @@ sub render
 }
 
 
+########################################################################
+package PDF::Template::Container::Always;
+########################################################################
+
+use vars qw(@ISA);
+@ISA = qw (PDF::Template::Container::Base);
+
+
+sub new
+{
+   my $proto = shift;
+   my $class = ref($proto) || $proto;
+   my $self = $class->SUPER::new(@_);
+   bless $self,$class;   
+   return $self;
+}
+
+
+sub render
+{
+   my ($self,$p, $r_handles) = @_;
+   my ($ref_loop_info);
+
+   my $oldval = $r_handles->{PENDINGBREAK};
+   $r_handles->{PENDINGBREAK} = 0;   
+
+   my $old_alreadydone = $r_handles->{ALREADY_DONE};
+   $r_handles->{ALREADY_DONE} = 0;
+   
+   # Render each of the elements / containers
+   for my $e (@{$self->{ELEMENTS}})
+   {
+      # Let the element render         
+      $e->render($p,$r_handles);
+   }
+      
+   $r_handles->{PENDINGBREAK} = $oldval;   
+   $r_handles->{ALREADY_DONE} = $old_alreadydone;
+   
+   0;   
+}
 
 
 
@@ -1552,6 +1657,8 @@ the few functions discussed above.  The bulk of things to know about using
 PDF::Template is the specification of template elements.  This section 
 is a reference for those elements.
 
+Example XML code can be found in the examples subdirectory.
+
 All XML objects fall into one of two categories: Containers or Elements.
 
 
@@ -1684,6 +1791,16 @@ An if else can be implemented in PDF::Template as:
   
 I considered nesting <true> and <false> tags in the if, but 
 I think the notation I chose is simpler for the average case.  
+
+=head3 <ALWAYS>
+
+Use this tag to indicate that the elements in this container
+will appear on every page.  This is mose useful when a LOOP 
+element in a PAGEDEF causes it to span multiple pages.  In this
+case, you could use ALWAYS to make headers and footers appear on 
+every page.  Otherwise, items before the LOOP would only appear
+on the first page and items after the loop would only appear on
+the last page.
 
 =head2 Elements
 

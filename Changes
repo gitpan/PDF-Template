@@ -2,4 +2,7 @@ Revision history for Perl extension PDF::Template.
 
 0.01  Wed Feb 13 15:31:36 2002
    - original version; created by h2xs 1.19
-
+0.02  Mon Mar 3 16:44:00 2002
+   - Swapped LMARGIN and RMARGIN (they were backwards)
+   - Adding the "always" concept, clarifying when things are rendered
+   - More test cases, which double as examples
