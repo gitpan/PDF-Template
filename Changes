@@ -1,5 +1,8 @@
 Revision history for Perl module PDF::Template
 
+0.12 Tue Dec 19 11:30:00 2003
+    - Fixed bug with HEADERs not appearing when landscape is set
+
 0.12 Tue Dec 16 09:30:00 2003
     - Fixed bug with HEADERs not appearing where appropriate when
       PAGE_SIZE option is chosen.

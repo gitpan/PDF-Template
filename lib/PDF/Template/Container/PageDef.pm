@@ -88,8 +88,8 @@ sub enter_scope
         ($pheight, $pwidth) = ($pwidth, $pheight);
 
         @{$self}{qw(PAGE_HEIGHT PAGE_WIDTH)}
-            = @{$self}{qw(_ORIG_HEIGHT _ORIG_WIDTH)}
-            = ($self->{PAGE_WIDTH}, $self->{PAGE_HEIGHT});
+            = @{$self}{qw(_ORIG_WIDTH _ORIG_HEIGHT)}
+            = @{$self}{qw(PAGE_WIDTH PAGE_HEIGHT)}
     }
 
     return $self->SUPER::enter_scope($context);
