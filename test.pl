@@ -6,7 +6,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..3\n"; }
+BEGIN { $| = 1; print "1..4\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use PDF::Template;
 $loaded = 1;
@@ -58,3 +58,13 @@ $t3->write_file("examples/t3_loop.pdf");
 
 print "ok 3\n";
 
+
+
+### Test 4 : Generic Elements
+
+
+my $t4 = new PDF::Template(FILENAME=>'examples/t4_elements.xml');
+
+$t4->write_file("examples/t4_elements.pdf");
+
+print "ok 4\n";

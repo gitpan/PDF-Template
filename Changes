@@ -6,3 +6,9 @@ Revision history for Perl extension PDF::Template.
    - Swapped LMARGIN and RMARGIN (they were backwards)
    - Adding the "always" concept, clarifying when things are rendered
    - More test cases, which double as examples
+0.03
+   - Rolf Beutner - Text color
+   - Robert Graff - US Paper sizes
+   - Christian Frantsen - Add width parameter for <line>
+   - Cleaned up test 2 (t2.xml)
+   - New test cases

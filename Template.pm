@@ -17,7 +17,7 @@ require Exporter;
 @EXPORT = qw(
    
 );
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 sub debug
 {
@@ -275,9 +275,21 @@ sub new
    }
 
    # default to normal paper size in US
-   if (!defined($self->{PAGESIZE})) { $self->{PAGESIZE} = 'A4'; }
+   if (!defined($self->{PAGESIZE})) { $self->{PAGESIZE} = 'Letter'; }
 
-   if ( $self->{PAGESIZE} eq 'A0')
+
+
+   if ( $self->{PAGESIZE} eq 'Letter' )
+   {
+     $self->{WIDTH} = 612;
+     $self->{HEIGHT} = 792;
+   }
+   elsif ( $self->{PAGESIZE} eq 'Legal' )
+   {
+     $self->{WIDTH} = 612;
+     $self->{HEIGHT} = 1008;
+   }
+   elsif ( $self->{PAGESIZE} eq 'A0')
    {
       $self->{WIDTH} = 2380;
       $self->{HEIGHT} = 3368;
@@ -749,6 +761,15 @@ sub render
 
    # PDFLIB Note:  It appears that PDFLib does not support text
    # in any color other than black.
+   # Or maybe it does
+   # But in a later version than I am using
+   # This doesn't work for me but your mileage may vary.  It shouldn't cause a 
+   # problem if you don't use it.  It might work if you do use it.
+   if (defined($self->{COLOR}))
+   {
+      my ($r,$g,$b) = split ',' , $self->{COLOR};
+      pdflib_pl::PDF_setcolor($p, 'both', 'rgb', $r/255,$g/255,$b/255,0);
+   }
 
    if (defined($self->{BGCOLOR}))
    {
@@ -917,6 +938,8 @@ sub new
    my $class = ref($proto) || $proto;
    my $self = $class->SUPER::new(@_);
    bless ($self,$class);   
+   
+   $self->{WIDTH} = 1;
 }
 
 sub render
@@ -928,7 +951,7 @@ sub render
       return 1;
    }
 
-   pdflib_pl::PDF_setlinewidth($p,1);
+   pdflib_pl::PDF_setlinewidth($p,$self->{WIDTH});
    pdflib_pl::PDF_moveto($p,$self->{X1},$self->{Y1});
    pdflib_pl::PDF_lineto($p,$self->{X2},$self->{Y2});
    pdflib_pl::PDF_stroke($p);
