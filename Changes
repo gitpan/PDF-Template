@@ -1,5 +1,8 @@
 Revision history for Perl module PDF::Template
 
+0.21 Mon Dec 06 10:30:00 2004
+    - Fixed tests to run under Perl 5.6.2 (do wasn't working correctly)
+
 0.20 Thu Dec 02 10:30:00 2004
     - Fixed tests so that they run correctly
     - Fixed Makefile.PL to generate Unicode-question correctly

@@ -36,7 +36,8 @@ foreach my $test (@tests)
         filename => File::Spec->catfile($dir, $test, $File{XML}),
     );
 
-    my %params = do File::Spec->catfile($dir, $test, $File{VAR});
+    %params = ();
+    do File::Spec->catfile($dir, $test, $File{VAR});
     $pdf->param(%params) if keys %params;
 
     my $buffer = $pdf->get_buffer;
