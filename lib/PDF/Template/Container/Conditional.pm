@@ -42,10 +42,6 @@ sub conditional_passes
             ? $isOp{$op}
             : '==';
 
-        # Force numerical context on both values;
-        $value *= 1;
-        $val *= 1;
-
         my $res;
         for ($op)
         {
@@ -62,7 +58,7 @@ sub conditional_passes
             /^ge$/ && do { $res = ($val ge $value); last };
             /^le$/ && do { $res = ($val le $value); last };
 
-            die "Unknown operator in conditional resolve", $/;
+            die "Unknown operator '$op' in conditional resolve", $/;
         }
 
         return 0 unless $res;

@@ -1,7 +1,9 @@
-Revision history for Perl module PDF::Template
+Revision history for Perl distribution PDF::Template
 
-0.21 Mon Dec 06 10:30:00 2004
-    - Fixed tests to run under Perl 5.6.2 (do wasn't working correctly)
+0.21 Tue Jan 11 10:00:00 2005
+    - Added tests to demonstrate bug submitted by Brian T. Wightman
+    - Fixed bug in conditionals submitted by Brian T. Wightman
+      - Conditionals now correctly handle string comparisons
 
 0.20 Thu Dec 02 10:30:00 2004
     - Fixed tests so that they run correctly

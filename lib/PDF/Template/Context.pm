@@ -247,7 +247,7 @@ sub check_end_of_page
 
     my $deltas = $obj->deltas($self);
 
-    if ($self->get($obj, 'Y') + $deltas->{Y} < $self->get($obj, 'END_Y'))
+    if (($self->get($obj, 'Y') || 0) + ($deltas->{Y} || 0) < ($self->get($obj, 'END_Y') || 0))
     {
         $self->trip_pagebreak;
         return 0;

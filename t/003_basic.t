@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-# t/002_simple.t - check handling of basic templates
+# t/003_basic.t - check handling of basic templates
 
 use Test::More tests => 1;
 
