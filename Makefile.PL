@@ -5,8 +5,10 @@ use ExtUtils::MakeMaker;
 use File::Spec;
 
 my $prereqs = {
-    'Test::Simple' => 0.44,
-    'XML::Parser'  => 0.01,
+    'Test::Simple'   => 0.44,
+    'XML::Parser'    => 0.01,
+    'IO::File'       => 0.01,
+    'File::Basename' => 0.01,
 };
 
 # The assumption is the 5.8.0 and greater doesn't need Unicode::String.

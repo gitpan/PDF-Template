@@ -6,11 +6,13 @@ BEGIN {
     use PDF::Template::Base;
     use vars qw ($VERSION @ISA);
 
-    $VERSION = 0.13;
+    $VERSION = 0.14;
     @ISA     = qw (PDF::Template::Base);
 }
 
 use pdflib_pl;
+
+use File::Basename;
 use IO::File;
 use XML::Parser;
 
@@ -128,8 +130,11 @@ sub parse_xml
         TEXTBOX
     );
 
+    my ($filename, $dirname) = fileparse($fname);
+ 
     my @stack;
     my $parser = XML::Parser->new(
+        Base => $dirname,
         Handlers => {
             Start => sub {
                 shift;
@@ -331,7 +336,7 @@ There are a few consistency rules that that every PDF::Template has to follow:
 =item 2 There must be at least one PAGEDEF (which does not have to be a direct
 child of the PDFTEMPLATE node)
 
-=item 3 All rendering elements must be within a PAGEDEF node
+=item 3 All rendering elements (include FONT tags) must be within a PAGEDEF node
 
 =item 4 There must be a FONT tag as an ancestor of every TEXTBOX node
 

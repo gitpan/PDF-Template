@@ -1,5 +1,10 @@
 Revision history for Perl module PDF::Template
 
+0.13 Tue Jan 20 12:30:00 2003
+    - Fixed bug IMAGE tag (caused by ..::Font::begin_page() not calling SUPER)
+    - Added Base to allow for external entities to be referenced by filename
+      without hard-coding the directory name.
+
 0.12 Tue Dec 19 11:30:00 2003
     - Fixed bug with HEADERs not appearing when landscape is set
 

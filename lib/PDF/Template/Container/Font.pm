@@ -83,7 +83,7 @@ sub begin_page
         $context->store_font($face, $font);
     }
 
-    return 1;
+    return $self->SUPER::begin_page($context);
 }
 
 1;

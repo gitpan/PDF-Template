@@ -9,16 +9,12 @@ BEGIN {
     use PDF::Template::Element;
 }
 
-sub new_unused
+sub new
 {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
 
-#GGG Currently unused
-#    for (qw/ALIGN VALIGN/)
-#    {
-#        $self->{$_} = uc $self->{$_} if defined $self->{$_};
-#    }
+    $self->{TXTOBJ} = PDF::Template::Factory->create('TEXTOBJECT');
 
     return $self;
 }

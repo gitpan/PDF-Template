@@ -1,6 +1,6 @@
 <pdftemplate h="8">
-  <font face="Times-Roman">
-    <pagedef>
+  <pagedef>
+    <font face="Times-Roman">
       <header header_height="1.5i">
         <image y="-1i">SomeSpecialImage.jpeg</image>
       </header>
@@ -34,6 +34,6 @@
           <textbox w="100%" justify="right">Page <var value="__PAGE__"/></textbox>
         </row>
       </footer>
-    </pagedef>
-  </font>
+    </font>
+  </pagedef>
 </pdftemplate>
