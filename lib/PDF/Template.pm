@@ -6,7 +6,7 @@ BEGIN {
     use PDF::Template::Base;
     use vars qw ($VERSION @ISA);
 
-    $VERSION = 0.15;
+    $VERSION = 0.16;
     @ISA     = qw (PDF::Template::Base);
 }
 
@@ -66,8 +66,9 @@ sub param
     (@_ % 2)
         && die __PACKAGE__, "->param() : Odd number of parameters to param()\n";
 
-    my %x = @_;
-    @{$self->{PARAM_MAP}}{keys %x} = @x{keys %x};
+    my %params = @_;
+    $params{uc $_} = delete $params{$_} for keys %params;
+    @{$self->{PARAM_MAP}}{keys %params} = @params{keys %params};
 
     return 1;
 }

@@ -1,5 +1,8 @@
 Revision history for Perl module PDF::Template
 
+0.16 Wed Mar 17 12:00:00 2003
+    - Parameter names are now case-insensitive
+
 0.15 Tue Mar 16 12:00:00 2003
     - Fixed bug w/using the same image in more than one <image> tag
 

@@ -9,6 +9,7 @@ my $prereqs = {
     'XML::Parser'    => 0.01,
     'IO::File'       => 0.01,
     'File::Basename' => 0.01,
+    'pdflib_pl'      => 3.00,
 };
 
 # The assumption is the 5.8.0 and greater doesn't need Unicode::String.

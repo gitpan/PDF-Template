@@ -34,6 +34,7 @@ sub param
 {
     my $self = shift;
     my ($param, $depth) = @_;
+    $param = uc $param;
     $depth ||= 0;
 
     my $val = undef;
