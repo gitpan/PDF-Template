@@ -64,6 +64,10 @@ sub enter_scope
 
     return 0 if $self->{NO_PARAMS};
 
+    for my $x ($self->{DATA}[$self->{INDEX}])
+    {
+        $x->{uc $_} = delete $x->{$_} for keys %$x;
+    }
     push @{$self->{CONTEXT}{PARAM_MAP}}, $self->{DATA}[$self->{INDEX}];
 
     return 1;

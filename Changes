@@ -1,5 +1,8 @@
 Revision history for Perl module PDF::Template
 
+0.17 Wed Mar 17 12:00:00 2003
+    - Fixed bug introduced in 0.16 (loop parameters weren't case-insensitive)
+
 0.16 Wed Mar 17 12:00:00 2003
     - Parameter names are now case-insensitive
 
