@@ -123,11 +123,9 @@ None
 
 =head1 USAGE
 
-<pdftemplate>
-
-  ... Children here ...
-
-</pdftemplate>
+  <pdftemplate>
+    ... Children here ...
+  </pdftemplate>
 
 =head1 AUTHOR
 

@@ -52,23 +52,25 @@ PDF::Template::Element
 
 =head1 PURPOSE
 
-=head1 NODE NAME
+To provide a base class for all rendering nodes.
 
-=head1 INHERITANCE
+=head1 COLORS
 
-=head1 ATTRIBUTES
+This is the class that handles colors. Colors in PDF::Template are specified in
+RGB format, comma-separated. Each number is from 0 to 255, with 0 being none and
+255 being most. If a color is not specified, 0 is assumed. Thus, "255,0,0",
+"255,0", and "255" will all result in a red color.
 
-=head1 CHILDREN
+Colors should be used for all attributes that have the word "COLOR" in the name.
+This includes (but may not be limited to):
 
-=head1 AFFECTS
+=over 4
 
-=head1 DEPENDENCIES
+=item * COLOR
 
-=head1 USAGE
+=item * FILLCOLOR
 
-=head1 AUTHOR
-
-Rob Kinyon (rkinyon@columbus.rr.com)
+=back 4
 
 =head1 SEE ALSO
 

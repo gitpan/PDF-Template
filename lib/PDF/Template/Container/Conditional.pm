@@ -173,17 +173,13 @@ None
 
 =head1 USAGE
 
-<if name="__PAGE__" OP="!=" VALUE="__LAST_PAGE__">
+  <if name="__PAGE__" OP="!=" VALUE="__LAST_PAGE__">
+    ... Children execute if the current page is not the last page ...
+  </if>
 
-  ... Children execute if the current page is not the last page ...
-
-</if>
-
-<if name="Param1" OP="eq" VALUE="$Param2">
-
-  ... Children execute if Param1 is string-wise equals to Param2 ...
-
-</if>
+  <if name="Param1" OP="eq" VALUE="$Param2">
+    ... Children execute if Param1 is string-wise equals to Param2 ...
+  </if>
 
 =head1 AUTHOR
 

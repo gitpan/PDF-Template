@@ -61,19 +61,37 @@ PDF::Template::Element::PageBreak
 
 =head1 PURPOSE
 
+To insert a hard pagebreak.
+
 =head1 NODE NAME
+
+PAGEBREAK
 
 =head1 INHERITANCE
 
+PDF::Template::Element
+
 =head1 ATTRIBUTES
+
+None
 
 =head1 CHILDREN
 
+None
+
 =head1 AFFECTS
+
+Nothing
 
 =head1 DEPENDENCIES
 
+None
+
 =head1 USAGE
+
+  <pagebreak/>
+
+This will cause a pagebreak to occur at the spot the node is.
 
 =head1 AUTHOR
 

@@ -49,21 +49,14 @@ None
 
 =head1 USAGE
 
-<scope w="100%">
-
-  <row h="18">
-
-    <textbox text="Hello, world"/>
-
-  </row>
-
-  <row h="8">
-
-    <textbox text="Goodbye, world"/>
-
-  </row>
-
-</scope>
+  <scope w="100%">
+    <row h="18">
+      <textbox text="Hello, world"/>
+    </row>
+    <row h="8">
+      <textbox text="Goodbye, world"/>
+    </row>
+  </scope>
 
 If you have a number of nodes that share common attribute values, but don't have
 a common parent, provide them with a no-op parent that allows consolidation of

@@ -192,11 +192,9 @@ None
 
 =head1 USAGE
 
-<pagedef pagesize="Legal" landscape="1">
-
-  ... Children will render to a Legal-sized paper in landscape orientation ...
-
-</pagedef>
+  <pagedef pagesize="Legal" landscape="1">
+    ... Children will render to a Legal-sized paper in landscape orientation ...
+  </pagedef>
 
 =head1 NOTE
 
@@ -204,23 +202,17 @@ It is very possible, and often useful, to have more than one pagedef in a given
 template. Also, the PAGEDEF does not have to be the direct child of the 
 PDFTEMPLATE node. It is sometimes useful to have something like:
 
-<pdftemplate>
-
-  <loop name="PAGEDEFS">
-
-    <pagedef
+  <pdftemplate>
+    <loop name="PAGEDEFS">
+      <pagedef
         pagesize="$PaperSize"
         landscape="$Orientation"
         nopagenumber="$TitlePage"
-    >
-
-      ... Children here ...
-
-    </pagedef>
-
-  </loop>
-
-</pdftemplate>
+      >
+        ... Children here ...
+      </pagedef>
+    </loop>
+  </pdftemplate>
 
 =head1 AUTHOR
 

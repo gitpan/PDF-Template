@@ -6,7 +6,7 @@ BEGIN {
     use PDF::Template::Base;
     use vars qw ($VERSION @ISA);
 
-    $VERSION = 0.10;
+    $VERSION = 0.11;
     @ISA     = qw (PDF::Template::Base);
 }
 
@@ -333,9 +333,9 @@ child of the PDFTEMPLATE node)
 
 =item 3 All rendering elements must be within a PAGEDEF node
 
-=item 4 There must be a FONT tag before any rendering nodes
+=item 4 There must be a FONT tag as an ancestor of every TEXTBOX node
 
-=item 5 Within a PAGEDEF, there can only be on HEADER node and one FOOTER node.
+=item 5 Within a PAGEDEF, there can only be on HEADER node and one FOOTER node
 
 =back 4
 
@@ -373,8 +373,20 @@ has acknowledged to me.
 
 =head1 AUTHOR
 
-    Originally written by Dave Ferrance (dave@ferrance.org)
-    Taken over after v0.05 by Rob Kinyon (rkinyon@columbus.rr.com)
+Originally written by Dave Ferrance (dave@ferrance.org)
+Taken over after v0.05 by Rob Kinyon (rkinyon@columbus.rr.com)
+
+=head1 CONTRIBUTORS
+
+Patches and ideas provided by:
+
+=over 4
+
+=item * Michael Kiwala
+
+=item * Nathan Byrd
+
+=back 4
 
 =head1 COPYRIGHT
 

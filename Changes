@@ -1,5 +1,15 @@
 Revision history for Perl module PDF::Template
 
+0.11 Fri Dec 07 17:00:00 2003
+    - Makefile.PL has two changes:
+        - <> => <STDIN>
+        - 5.8+ will now not ask you about Unicode support.
+    - PDF::Template::Factory::register() now works correctly
+    - All nodes are now documented (still need to document helper classes)
+    - WEBLINK will now work with parameterized X1/X2/Y1/Y2
+
+    Thanks to Nathan Byrd for pointing out and providing patches for two bugs.
+
 0.10 Fri Nov 30 17:00:00 2003
     - Wholescale changes to the underlying structure
     - Addition of a concept of scope, allowing for relative positioning

@@ -84,19 +84,52 @@ PDF::Template::Element::Circle
 
 =head1 PURPOSE
 
+To draw a circle.
+
 =head1 NODE NAME
+
+CIRCLE
 
 =head1 INHERITANCE
 
+PDF::Template::Element
+
 =head1 ATTRIBUTES
+
+=over 4
+
+=item * R
+This is the radius of the circle to be drawn
+
+=item * COLOR
+This is the color the circle should be drawn in. Defaults to black.
+
+=item * FILLCOLOR
+This is the color the circle should be filled in with. Defaults to none.
+
+=item * WIDTH
+This is the width of the line used to draw the circle. Defaults to 1 pixel.
+
+=back 4
 
 =head1 CHILDREN
 
+None
+
 =head1 AFFECTS
+
+Nothing
 
 =head1 DEPENDENCIES
 
+None
+
 =head1 USAGE
+
+  <circle R="1i" color="255,0,0"/>
+
+This will cause a 1-inch radius circle to be drawn at the current position in
+red.
 
 =head1 AUTHOR
 

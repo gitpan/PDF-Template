@@ -115,11 +115,9 @@ None
 
 =head1 USAGE
 
-<section>
-
-  .. Children here ...
-
-</section>
+  <section>
+    .. Children here ...
+  </section>
 
 The children will be rendered on the same page, if at all possible.
 

@@ -66,8 +66,10 @@ sub render
     my $w = $context->get($self, 'W');
     my $h = $context->get($self, 'H');
 
-    my $justify = $context->get($self, 'JUSTIFY') || $context->get($self, 'ALIGN');
-    $self->_validate_option('JUSTIFY', \$justify);
+    my $align = $context->get($self, 'ALIGN') ||
+                $context->get($self, 'JUSTIFY');
+
+    $self->_validate_option('ALIGN', \$align);
 
     $self->set_color($context, 'COLOR', 'both');
 
@@ -87,7 +89,7 @@ sub render
     $self->{TEMP_H} = $self->show_boxed(
         $context, $txt,
         $x, $y, $w, $h,
-        $justify, '',
+        $align, '',
     );
 
     if ($context->get($self, 'BGCOLOR'))
@@ -214,7 +216,7 @@ UNI_NO     return length($str);
 sub show_boxed
 {
     my $self = shift;
-    my ($context, $str, $x, $y, $w, $h, $justify, $mode) = @_;
+    my ($context, $str, $x, $y, $w, $h, $align, $mode) = @_;
 
     my $fsize = pdflib_pl::PDF_get_value($context->{PDF}, "fontsize", undef);
     $fsize = 0 if $fsize < 0;
@@ -231,7 +233,7 @@ UNI_NO     my $excess_txt = '';
         my $leftovers = $self->_show_boxed(
             $context, $str,
             $x, $y, $w, $h,
-            $justify, $mode,
+            $align, $mode,
         );
         die "Invalid return ($leftovers) from pdflib_pl::PDF_show_boxed() on string '$str'", $/
 UNI_YES            if $leftovers > $str->length;
@@ -299,24 +301,112 @@ PDF::Template::Element::TextBox
 
 =head1 PURPOSE
 
+To write text in a specified spot
+
 =head1 NODE NAME
+
+TEXTBOX
 
 =head1 INHERITANCE
 
+PDF::Template::Element
+
 =head1 ATTRIBUTES
+
+=over 4
+
+=item * TEXT
+This is the text for this textbox. Can be either as a parameter or as character
+children of this node. Defaults to '' (the empty string).
+
+=item * ALIGN / JUSTIFY
+This is the orientation of the text in the textbox. Legal values are:
+
+=over 4
+
+=item * Left (default)
+
+=item * Center
+
+=item * Right
+
+=item * Full (NOT IMPLEMENTED)
+
+=back 4
+
+JUSTIFY is provided for backwards compatibility, and is deprecated.
+
+=item * COLOR
+This is the color of the text
+
+=item * BGCOLOR
+This is the color of background
+
+=item * BORDER
+This is a boolean specifying if a border should be drawn. Currently, the border
+is drawn in the same color as the text.
+
+=item * LMARGIN / RMARGIN
+These are the paddings within the textbox for the text. This is useful if you
+are listing columns of numbers and don't want them to run into one another.
+
+=item * H
+Normally, one would not set H, as it should be set by either the FONT or ROW
+ancestor. However, it can be useful to do the following:
+
+  <font h="8" face="Times-Roman">
+
+    <row>
+      <textbox w="100%" h="*4">Some text here</textbox>
+    </row>
+
+  </font>
+
+That will create textbox which will occupy four rows of text at whatever size
+the font is set to.
+
+=item * TRUNCATE_TEXT
+Normally, at textbox will use as many rows it needs to write the text given to
+it. (It will always respect its width requirement, even to the point of
+splitting words, though it tries hard to preserve words.) However, sometimes
+this behavior is undesirable.
+
+Set this to a true value and the height value will be a requirement, not an
+option.
+
+=back 4
 
 =head1 CHILDREN
 
+None
+
 =head1 AFFECTS
+
+Nothing
 
 =head1 DEPENDENCIES
 
+ROW
+
 =head1 USAGE
+
+  <row h="8">
+    <textbox w="40%" text="Some text here"/>
+    <textbox w="60%"><var name="Param1"/> and stuff</textbox>
+  </row>
+
+This will put two textboxes on the page at the current Y-position. The first
+will occupy 40% of the write-able space and contain the text "Some text here".
+The second will occupy the rest and contain the text from Param1, then the text
+" and stuff". (This is the only way to mix parameters and static text in the
+same textbox.)
 
 =head1 AUTHOR
 
 Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
+
+ROW
 
 =cut

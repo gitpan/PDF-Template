@@ -282,31 +282,3 @@ sub increment_pagenumber { $_[0]{PARAM_MAP}[0]{$_}++ for qw(__PAGE__ __PAGEDEF_P
 
 1;
 __END__
-
-=head1 NAME
-
-PDF::Template::Context
-
-=head1 PURPOSE
-
-=head1 NODE NAME
-
-=head1 INHERITANCE
-
-=head1 ATTRIBUTES
-
-=head1 CHILDREN
-
-=head1 AFFECTS
-
-=head1 DEPENDENCIES
-
-=head1 USAGE
-
-=head1 AUTHOR
-
-Rob Kinyon (rkinyon@columbus.rr.com)
-
-=head1 SEE ALSO
-
-=cut

@@ -46,17 +46,6 @@ BEGIN {
     'BASE'       => 'PDF::Template::Base',
 );
 
-while (my ($k, $v) = each %Manifest)
-{
-    (my $n = $v) =~ s!::!/!g;
-    $n .= '.pm';
-
-    $Manifest{$k} = {
-        package  => $v,
-        filename => $n,
-    };
-}
-
 %isBuildable = map { $_ => 1 } qw(
     ALWAYS
     BOOKMARK
@@ -127,13 +116,15 @@ sub create
 
     return unless exists $Manifest{$name};
 
+    (my $filename = $Manifest{$name}) =~ s!::!/!g;
+
     eval {
-        require $Manifest{$name}{filename};
+        require "$filename.pm";
     }; if ($@) {
-        die "Cannot find PM file for '$name' ($Manifest{$name}{filename})\n";
+        die "Cannot find or compile PM file for '$name' ($filename)\n";
     }
 
-    return $Manifest{$name}{package}->new(@_);
+    return $Manifest{$name}->new(@_);
 }
 
 sub create_node
@@ -148,39 +139,11 @@ sub create_node
 
 sub isa
 {
-    return unless @_ >= 2;
-    exists $Manifest{uc $_[1]}
-        ? UNIVERSAL::isa($_[0], $Manifest{uc $_[1]}{package})
-        : UNIVERSAL::isa(@_)
+    return UNIVERSAL::isa($_[0], $Manifest{uc $_[1]})
+        if @_ >= 2 && exists $Manifest{uc $_[1]};
+
+    UNIVERSAL::isa(@_)
 }
 
 1;
 __END__
-
-=head1 NAME
-
-PDF::Template::Factory
-
-=head1 PURPOSE
-
-=head1 NODE NAME
-
-=head1 INHERITANCE
-
-=head1 ATTRIBUTES
-
-=head1 CHILDREN
-
-=head1 AFFECTS
-
-=head1 DEPENDENCIES
-
-=head1 USAGE
-
-=head1 AUTHOR
-
-Rob Kinyon (rkinyon@columbus.rr.com)
-
-=head1 SEE ALSO
-
-=cut

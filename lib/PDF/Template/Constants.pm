@@ -5,9 +5,8 @@ use strict;
 BEGIN {
     use Exporter ();
 
-    use vars qw($VERSION @ISA @EXPORT_OK);
+    use vars qw(@ISA @EXPORT_OK);
 
-    $VERSION = '0.01';
     @ISA = qw(Exporter);
 
     @EXPORT_OK = qw(
@@ -40,7 +39,7 @@ our %Verify = (
         )),
     },
 
-    'JUSTIFY' => {
+    'ALIGN' => {
         '__DEFAULT__' => 'left',
 #GGG Add a full-justify option - this requires a lot of coding prowess
         ( map { $_ => 1 } qw(
@@ -98,31 +97,3 @@ our %Verify = (
 
 1;
 __END__
-
-=head1 NAME
-
-PDF::Template::Constants
-
-=head1 PURPOSE
-
-=head1 NODE NAME
-
-=head1 INHERITANCE
-
-=head1 ATTRIBUTES
-
-=head1 CHILDREN
-
-=head1 AFFECTS
-
-=head1 DEPENDENCIES
-
-=head1 USAGE
-
-=head1 AUTHOR
-
-Rob Kinyon (rkinyon@columbus.rr.com)
-
-=head1 SEE ALSO
-
-=cut

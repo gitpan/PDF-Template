@@ -156,11 +156,9 @@ FOOTER - indicates where to pagebreak
 
 =head1 USAGE
 
-<loop name="LOOPY">
-
-  ... Children here ...
-
-</loop>
+  <loop name="LOOPY">
+    ... Children here ...
+  </loop>
 
 The children tags will have access to the values specified in LOOPY, as well as
 the parameters specifed outside.

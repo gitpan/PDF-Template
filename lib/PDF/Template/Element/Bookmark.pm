@@ -54,7 +54,7 @@ Creates a bookmark in the resultant PDF.
 
 =head1 NODE NAME
 
-&lt;bookmark&gt;
+BOOKMARK
 
 =head1 INHERITANCE
 
@@ -79,14 +79,14 @@ None
 
 =head1 USAGE
 
-Add it anywhere you would like a bookmark to appear in the PDF.
+  <bookmark text="Some Bookmark"/>
+
+That now adds a bookmark for that spot to the PDF, called "Some Bookmark".
 
 =head1 AUTHOR
 
 Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
-
-TBA
 
 =cut

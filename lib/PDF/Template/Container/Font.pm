@@ -130,15 +130,18 @@ None
 
 =head1 USAGE
 
-<font face="Times-Roman" h="8">
+  <font face="Times-Roman" h="8">
 
-  ... Children will be rendered in 8-point TimesRoman font ...
+    ... Children will be rendered in 8-point TimesRoman font ...
 
-</font>
+  </font>
 
 Please note that not specifying a FONT tag will result in a PDFLib error when
 the first TEXTBOX attempts to render. Since not all PDF documents involve text,
 PDF::Template does not require a FONT tag.
+
+(I might require a FONT tag if a TEXTBOX tag exists, but only after the non-
+standard behavior of FONT is fixed. q.v. the NOTE below.)
 
 =head1 NOTE
 
@@ -146,15 +149,15 @@ For backwards compatability, a stand-alone FONT tag will be treated as if it is
 the parent for all nodes until the end of the parent node. This behavior is
 deprecated and will be removed in a future release.
 
-<pagedef>
+  <pagedef>
 
-  ... Children here aren't affected by the FONT tag below ...
+    ... Children here aren't affected by the FONT tag below ...
 
-  <font face="Times-Roman" h="8"/>
+    <font face="Times-Roman" h="8"/>
 
-  ... Children here _ARE_ affected by the FONT tag above ...
+    ... Children here _ARE_ affected by the FONT tag above ...
 
-</pagedef>
+  </pagedef>
 
 =head1 AUTHOR
 

@@ -85,13 +85,10 @@ None
 
 =head1 USAGE
 
-<row h="8">
-
-  <textbox w="50%" justify="right" text"Hello,"/>
-
-  <textbox w="50%" justify="left" text"World"/>
-
-</row>
+  <row h="8">
+    <textbox w="50%" justify="right" text"Hello,"/>
+    <textbox w="50%" justify="left" text"World"/>
+  </row>
 
 =head1 AUTHOR
 

@@ -64,17 +64,12 @@ None
 
 =head1 USAGE
 
-<pagedef>
-
-  <header header_height="1i">
-
-    ... Children here will render on every page ...
-
-  </header>
-
-  ... Stuff here ...
-
-</pagedef>
+  <pagedef>
+    <header header_height="1i">
+      ... Children here will render on every page ...
+    </header>
+    ... Stuff here ...
+  </pagedef>
 
 =head1 AUTHOR
 

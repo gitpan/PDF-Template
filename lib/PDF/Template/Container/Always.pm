@@ -80,11 +80,9 @@ None
 
 =head1 USAGE
 
-<always>
-
-  ... Children will render on every page ...
-
-</always>
+  <always>
+    ... Children will render on every page ...
+  </always>
 
 =head1 AUTHOR
 

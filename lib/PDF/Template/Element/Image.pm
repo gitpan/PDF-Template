@@ -176,19 +176,64 @@ PDF::Template::Element::Image
 
 =head1 PURPOSE
 
+To embed images
+
 =head1 NODE NAME
+
+IMAGE
 
 =head1 INHERITANCE
 
+PDF::Template::Element
+
 =head1 ATTRIBUTES
+
+=over 4
+
+=item * FILENAME
+This is the filename for the image.
+
+=item * TYPE
+If the image type is not specified in the filename, specify it here.
+
+=item * SCALE / W / H
+This is used to scale the image. SCALE is a value by which the image's height
+and width will be multiplied to arrive at the final height and width. Or, you
+can set W and or H, as the width (or height) you want the image to have, once
+scaled.
+
+The algorithm used to calculate scaling has changed, somewhat, from v0.05. It
+should result in better calculations, as it tries more avenues. Ultimately, if
+it cannot figure out what to do, it will set a SCALE of 0.5 and go from there.
+
+=item * BORDER
+This is a boolean, used to specify if you want to draw a border around the image
+
+=item * COLOR
+Ignored unless BORDER is specified. This is the color of the border.
+
+=back 4
 
 =head1 CHILDREN
 
+None
+
 =head1 AFFECTS
+
+Nothing
 
 =head1 DEPENDENCIES
 
+None
+
 =head1 USAGE
+
+  <image filename="$Image1"/>
+
+  <image><var name="Image1"/></image>
+
+In both cases, the image specified by the parameter "Image1" will be placed at
+the current X/Y position.
 
 =head1 AUTHOR
 

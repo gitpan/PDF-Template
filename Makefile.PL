@@ -9,18 +9,18 @@ my $prereqs = {
     'XML::Parser'  => 0.01,
 };
 
-print "Do you want Unicode support? ";
-my $answer = <>;
-my $need_unicode = $answer =~ /^[Yy]/;
-
-my $use_unicode = 0;
-if ($need_unicode)
+# The assumption is the 5.8.0 and greater doesn't need Unicode::String.
+if ($] < 5.008)
 {
-    # The assumption is the 5.8.0 and greater doesn't need Unicode::String.
-    if ($] < 5.008)
+    print "Do you want Unicode support? ";
+    my $answer = <STDIN>;
+    my $need_unicode = $answer =~ /^[Yy]/;
+
+    my $use_unicode = 0;
+    if ($need_unicode)
     {
-        $prereqs{'Unicode::String'} = '0.01';
-        $use_unicode = 1;
+            $prereqs{'Unicode::String'} = '0.01';
+            $use_unicode = 1;
     }
 }
 

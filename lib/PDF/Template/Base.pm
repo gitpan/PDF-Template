@@ -3,9 +3,6 @@ package PDF::Template::Base;
 use strict;
 
 BEGIN {
-    use vars qw($VERSION);
-
-    $VERSION = 0.01;
 }
 
 use PDF::Template::Constants qw(
@@ -142,31 +139,3 @@ sub end_page
 
 1;
 __END__
-
-=head1 NAME
-
-PDF::Template::Base
-
-=head1 PURPOSE
-
-=head1 NODE NAME
-
-=head1 INHERITANCE
-
-=head1 ATTRIBUTES
-
-=head1 CHILDREN
-
-=head1 AFFECTS
-
-=head1 DEPENDENCIES
-
-=head1 USAGE
-
-=head1 AUTHOR
-
-Rob Kinyon (rkinyon@columbus.rr.com)
-
-=head1 SEE ALSO
-
-=cut

@@ -17,7 +17,6 @@ sub enter_scope
     @{$self}{qw/OLD_X OLD_Y/} = map { $context->get($self, $_) } qw(X Y);
 
     $context->{X} = 0;
-#GGG
     $context->{Y} = $context->resolve($self, 'FOOTER_HEIGHT');
 
     return $self->SUPER::enter_scope($context);
@@ -65,17 +64,12 @@ None
 
 =head1 USAGE
 
-<pagedef>
-
-  ... Stuff here ...
-
-  <footer footer_height="1i">
-
-    ... Children here will render on every page ...
-
-  </footer>
-
-</pagedef>
+  <pagedef>
+    ... Stuff here ...
+    <footer footer_height="1i">
+      ... Children here will render on every page ...
+    </footer>
+  </pagedef>
 
 =head1 AUTHOR
 
