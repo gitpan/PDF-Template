@@ -1,0 +1,11 @@
+<pdftemplate name="test">
+<pagedef pagesize="A3">
+<font size="12" face="Times-Italic"></font>
+<textbox x="50" y="750" w="495" h="50" size="24" justify="center">Insert text here. <var NAME="SUBTITLE"></var></textbox>
+<image x="50" y="20" type='png'>examples/hrdm100n.png</image>
+<table X="50" Y="700" W="400" H="300" ROWHEIGHT="30" NAME="DATA">
+  <column WIDTH="150">some text</column>
+  <column WIDTH="150">yoyoyo</column>
+</table>
+</pagedef>
+</pdftemplate>
