@@ -8,7 +8,7 @@ if ($@) {
     die <<DEATH;
 
 PDF::Template requires the pdflib package from http://www.pdflib.com/ version
-3.0 or higher to be installed, and the perl interface "pdflib_pl.pm"
+4.0 or higher to be installed, and the perl interface "pdflib_pl.pm"
 enabled to be able to work properly. Please install that before trying
 to install this module.
 
@@ -21,5 +21,5 @@ DEATH
 WriteMakefile(
     'NAME'	=> 'PDF::Template',
     'VERSION_FROM' => 'Template.pm', # finds $VERSION
-    'PREREQ_PM' => { pdflib_pl => 3.0 },
+    'PREREQ_PM' => { pdflib_pl => 4.0 },
 );

@@ -5,5 +5,11 @@ Template.pm
 test.pl
 readme
 examples/hrdm100n.png
+examples/check.jpg
 examples/t2.xml
 examples/t3_loop.xml
+examples/t4_elements.xml
+examples/t5_images.xml
+examples/t6_conditionals.xml
+examples/t7_fonts.xml
+examples/impact.ttf

@@ -1,11 +1,10 @@
-Version 0.03 is ALPHA.  Certain things need improvement:
+Version 0.05 is ALPHA.  Certain things need improvement:
 
  * Documentation
  * Semantics of current Y position
  * Examples / Test Cases
  
-This module requires pdflib be installed.  It will not work without it.  It
-doesn't yet check for it in the install.
+This module requires pdflib be installed.  It will not work without it.  
 
 While I probably won't make huge changes to the XML spec,
 there may be minor, non-backwards-compatible changes for

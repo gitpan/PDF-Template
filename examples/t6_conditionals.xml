@@ -1,0 +1,43 @@
+<pdftemplate name="test">
+
+<pagedef pagesize="Letter">
+
+<font size="24" face="Times-Italic"></font>
+
+<textbox x="50" y="550" w="495" h="50" justify="center">Insert text here.</textbox>
+
+<loop x='50' w='400' y='450' y2='120' name='DATA'>
+
+   <row h='25'>
+      <textbox w='200' h='25' x='50'>Number: <var name='N'/></textbox>
+   </row>
+   
+   <row h='25'>
+      <textbox w='200' h='25' x='50'>First:
+      </textbox>
+      <if name="__FIRST__" is='TRUE'>
+         <image x='150' y='0' type='jpeg'>examples/check.jpg</image>
+      </if>
+   </row>
+   
+   <row h='25'>
+      <textbox w='200' h='25' x='50'>Last:
+      </textbox>
+      <if name="__LAST__" is='TRUE'>
+         <image x='150' y='0' type='jpeg'>examples/check.jpg</image>
+      </if>
+   </row>
+   
+   <row h='25'>
+      <textbox w='200' h='25' x='50'><var name='N'/> &gt; 3: </textbox>
+      <if name="N" op='>' value='3'>
+         <image x='150' y='0' type='jpeg'>examples/check.jpg</image>
+      </if>
+   </row>
+
+   <page-break/>
+   
+</loop>
+
+</pagedef>
+</pdftemplate>

@@ -15,3 +15,26 @@ Revision history for Perl extension PDF::Template.
 0.04
    - Fixed bug in get_buffer().  Thanks Marco!
    - makefile.pl now checks for pdflif_pl.pm installed
+0.05 Mon Jul 8 2002
+   - Added missing test file to manifest
+   - determine image type from file extension if it wasn't passed in (Mike Andreev)
+   - Chg required version of pdflib  to 4.0 (necessary for PDF_setcolor)
+   - Added <circle> object (thanks Andy Thaller)   
+   - bug fix for __FIRST__
+   - Adding operators to conditional
+   - Adding all sorts of image justification stuff (not sure it works yet though)
+   - Adding image border
+   - Added unicode support (not tested yet)
+   - Adding support for external fonts
+   - bug fix for images rendering when they shouldn't
+   - Added image test
+   - Added conditional test
+   - Added font test
+     The font test uses impact.ttf.  I grabbed this off of a website, it is probably
+     not legal for me to include it.  I'll find a free truetype font soon to replace
+     it with.     
+   - Fixed bug with <page-break> that wasn't in a loop
+   - Fixed bug with multiple top level <loop>   
+   
+   - thanks to Mike Andreev for many of the enhancements this version
+

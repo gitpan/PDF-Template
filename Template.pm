@@ -1,6 +1,6 @@
 package PDF::Template;
 
-use pdflib_pl 3.02;
+use pdflib_pl;
 use XML::Parser;
 
 use Data::Dumper;  # temp (appears below numerous times too :( )
@@ -17,11 +17,12 @@ require Exporter;
 @EXPORT = qw(
    
 );
-$VERSION = '0.04';
+$VERSION = '0.05';
 
+# Change if statement to print debug messages
 sub debug
 {
-   print @_;
+   print @_ if 0;
 }
 
 
@@ -32,7 +33,6 @@ sub debug
 # conditional - test with nested loops in it
 # move font finding stuff to font->begin_page
 # TODO should be ::Container::Pagedef
-# loop maxiters
 # PDF_set_info - find out more about this
 # Need to make ALREADYDONE as clear as PENDINGBREAK is
 #   - Added loop variable __PAGEFIRST__
@@ -161,7 +161,14 @@ sub _parse_xml
 {
    my ($self,$fname) = @_;
    
-   my $parser = new XML::Parser(Style=>"Tree");
+   my %parse_param = (Style=>"Tree"); 
+   if( defined $self->{ENCODING}){
+       $parse_param{ ProtocolEncoding } = $self->{ENCODING};
+       require Unicode::MapUTF8;
+   }
+
+   my $parser = new XML::Parser( %parse_param  );
+
    my $out = $parser->parsefile($fname);
 
    # So this should be an array ref of tag content pairs
@@ -190,6 +197,7 @@ sub _parse_xml
          {
             my $xref = $aref->[$y+1];
             my $href = shift @{$xref};
+	    $href->{ENCODING} = $self->{ENCODING} if defined $self->{ENCODING};
             my $pd = PDF::Template::PageDef->new(%{$href});
             $pd->_parse_xml($xref);
             $self->add_pagedef($pd);
@@ -219,9 +227,20 @@ sub _prepare_output
    # none, bookmarks, thumbnails, fullscreen
    PDF_set_parameter($p, 'openmode',$self->{OPENMODE});
    
-   # TODO: Make these attributes!!!
-   PDF_set_info($p, "Creator", "HRDatamine");
-   PDF_set_info($p, "Author", "Levy & Associates, Inc.");
+   if( defined $self->{INFO} && ref $self->{INFO} eq 'HASH' ){
+       foreach my $k ( keys %{$self->{INFO}} ){
+	   if( $k eq 'CreationDate' || $k eq 'Producer' || 
+	       $k eq 'ModDate' || $k eq 'Trapped' ){
+	       warn "PDF::Template: document property $k can not be set \n";
+	       next;
+	   }
+	   PDF_set_info($p, $k, $self->{INFO}->{$k});
+       }
+   }else{
+   PDF_set_info($p, "Creator", "PDF::Template");
+   PDF_set_info($p, "Author", "PDF::Template");
+   }
+
 
    my %handles = (
       FONTS => {},
@@ -361,10 +380,12 @@ sub render
 
 
       #TODO: move to font::_begin_page
+      my $encoding = $self->{ENCODING} || 'host';
       my $key;
       for $key (keys %{$ref_fonts})
       {
-         $ref_fonts->{$key} = pdflib_pl::PDF_findfont($p,$key,"host",0);
+         $ref_fonts->{$key}->{I} = pdflib_pl::PDF_findfont($p,$key,$encoding,
+							   $ref_fonts->{$key}->{EMBED});
       }
 
 
@@ -425,6 +446,14 @@ sub new
       STACK => []
    };
    
+   for (my $x = 0; $x <= $#_; $x += 2) 
+   {
+      my $opt = uc($_[$x]);
+      
+      defined($_[($x + 1)]) or die "PDF::Template::TextObject->new() called with odd number of option parameters - should be of the form option => value";
+      $self->{$opt} = $_[($x + 1)]; 
+   }
+
    bless $self;
 }
 
@@ -438,7 +467,12 @@ sub resolve
    {
       if ($k->{TYPE} eq 'TXT') 
       {
+	  if( defined $self->{PAGE}->{ENCODING} ){
+	      $t .= Unicode::MapUTF8::from_utf8({ -string => $k->{VAL},
+						  -charset => $self->{PAGE}->{ENCODING} });
+	  }else{
          $t .= $k->{VAL};
+      }
       }
       elsif ($k->{TYPE} eq 'VAR')
       {
@@ -550,6 +584,7 @@ sub _parse_xml
       
       my $aref = $xref->[$y+1];
       my $href = shift @{$aref};
+      $href->{ PAGE } = (defined ref($self) && ref($self) eq 'PDF::Template::PageDef' )?$self:$self->{ PAGE };
       my $t;
       
       if ($tag eq 'TEXTBOX')
@@ -567,6 +602,10 @@ sub _parse_xml
       elsif ($tag eq 'LINE')
       {
          $t = PDF::Template::Element::Line->new(%{$href});
+      }
+      elsif ($tag eq 'CIRCLE')
+      {
+         $t = PDF::Template::Element::Circle->new(%{$href});
       }
       elsif ($tag eq 'LOOP')
       { 
@@ -626,7 +665,7 @@ sub y
 {
    my ($self) = @_;
    my $y = $self->{Y};
-   $y += $y->{Y_BASE} if (defined($self->{Y_BASE}));
+   $y += $self->{Y_BASE} if (defined($self->{Y_BASE}));
    $y;
 }
 
@@ -689,7 +728,13 @@ sub set_y_base
 sub y
 {
    my ($self) = @_;
-   my $y = $self->{Y};
+   my $y;
+   if( defined $self->{Y_TOP} && defined $self->{H} ){
+       $y = $self->{ PAGE }->{HEIGHT} - $self->{Y_TOP} - $self->{H};
+       if( $y < 0 ){ $y = 0; }
+   }else{
+       $y = $self->{Y};
+   }
    $y += $self->{Y_BASE} if (defined($self->{Y_BASE}));
    $y;
 }
@@ -718,7 +763,7 @@ sub new
 
    bless($self,$class);
 
-   $self->{TXTOBJ} = PDF::Template::TextObject->new();
+   $self->{TXTOBJ} = PDF::Template::TextObject->new( PAGE => $self->{PAGE} );
    
    if (!defined($self->{JUSTIFY})) { $self->{JUSTIFY}='left'; }
 
@@ -729,14 +774,11 @@ sub render
 {
    my ($self,$p, $r_handles) = @_;
 
-   if ($r_handles->{PENDINGBREAK})
-   {
-      return 1;
-   }
+   return 1 if ($r_handles->{PENDINGBREAK});
+   return 0 if ($r_handles->{ALREADY_DONE});
 
-   if ($r_handles->{ALREADY_DONE}) { return 0; }
 
-   my $ref_fonts     = $r_handles->{FONTS};
+#   my $ref_fonts     = $r_handles->{FONTS};
    my $ref_param_map = $r_handles->{PARAM_MAP};
 
    my $ref_loop_info = $r_handles->{INNER};   
@@ -757,15 +799,10 @@ sub render
       $x = pdflib_pl::PDF_get_value($p,'textx',0);
    }
 
-#print "print: ^$txt^\n";
-#print "pos: x $x y $y \n"; 
+PDF::Template::debug "print: ^$txt^\n";
+PDF::Template::debug "pos: x $x y $y \n"; 
 
-   # PDFLIB Note:  It appears that PDFLib does not support text
-   # in any color other than black.
-   # Or maybe it does
-   # But in a later version than I am using
-   # This doesn't work for me but your mileage may vary.  It shouldn't cause a 
-   # problem if you don't use it.  It might work if you do use it.
+   # I think color started working in PDFLib 4.0
    if (defined($self->{COLOR}))
    {
       my ($r,$g,$b) = split ',' , $self->{COLOR};
@@ -774,11 +811,12 @@ sub render
 
    if (defined($self->{BGCOLOR}))
    {
+      pdflib_pl::PDF_save($p);
       my ($r,$g,$b) = split ',' , $self->{BGCOLOR};
       pdflib_pl::PDF_setrgbcolor_fill($p,$r/255,$g/255,$b/255);
       pdflib_pl::PDF_rect($p,$x,$y,$w,$h);
       pdflib_pl::PDF_fill($p);
-      pdflib_pl::PDF_setrgbcolor_fill($p,0,0,0);
+      pdflib_pl::PDF_restore($p);
    }
    
    if (defined($self->{BORDER}))
@@ -805,7 +843,12 @@ sub render
                   $self->{JUSTIFY},
                   ''
                   );   
-                  
+
+   # This isn't quite right, but....   
+   if (defined($self->{COLOR}))
+   {
+      pdflib_pl::PDF_setcolor($p, 'both', 'rgb', 0,0,0,0);
+   }
 
    # PDF_Show_Boxed screws up the text pointer.  It appears to move
    # ***UP*** the page instead of down.
@@ -912,7 +955,7 @@ sub render
    my $size = $self->{SIZE};
    my $ref_fonts = $r_handles->{FONTS};
       
-   pdflib_pl::PDF_setfont($p,$ref_fonts->{$face},$size);
+   pdflib_pl::PDF_setfont($p,$ref_fonts->{$face}->{I},$size);
    0;
 }
 
@@ -921,8 +964,10 @@ sub _begin_page
    my ($self,$p,$r_handles) = @_;
    my $path = $self->{PATH};
 
-   $r_handles->{FONTS}->{$self->{FACE}} = '';
-   
+   $r_handles->{FONTS}->{$self->{FACE}} = {
+       I => '',
+       EMBED => $self->{EMBED} || 0
+   };
 }
 
 
@@ -938,9 +983,13 @@ sub new
    my $proto = shift;
    my $class = ref($proto) || $proto;
    my $self = $class->SUPER::new(@_);
+
+   $self->{WIDTH} = 1 if not defined($self->{WIDTH});
+   
    bless ($self,$class);   
    
-   $self->{WIDTH} = 1;
+
+   return $self;
 }
 
 sub render
@@ -952,13 +1001,92 @@ sub render
       return 1;
    }
 
+   pdflib_pl::PDF_save($p);
+
+   # use color is specified
+    if (defined($self->{COLOR}))
+    {
+       my ($r,$g,$b) = split ',' , $self->{COLOR};
+       pdflib_pl::PDF_setcolor($p, 'both', 'rgb', $r/255,$g/255,$b/255,0);
+    }
+
    pdflib_pl::PDF_setlinewidth($p,$self->{WIDTH});
    pdflib_pl::PDF_moveto($p,$self->{X1},$self->{Y1});
    pdflib_pl::PDF_lineto($p,$self->{X2},$self->{Y2});
    pdflib_pl::PDF_stroke($p);
 
+   pdflib_pl::PDF_restore($p);
+
    0;   
 }
+
+
+
+########################################################################
+package PDF::Template::Element::Circle;
+########################################################################
+
+use vars qw(@ISA);
+@ISA=qw(PDF::Template::Element::Base);
+
+sub new
+{
+   my $proto = shift;
+   my $class = ref($proto) || $proto;
+   my $self = $class->SUPER::new(@_);
+   $self->{WIDTH} = 1 if not defined($self->{WIDTH});
+   bless ($self,$class);
+
+   warn 'Warning: <circle> missing required attribute X' if not defined ( $self->{X} );
+   warn 'Warning: <circle> missing required attribute Y' if not defined ( $self->{Y} );
+   warn 'Warning: <circle> missing required attribute R' if not defined ( $self->{R} );
+
+   return $self;
+}
+
+sub render
+{
+   my ($self,$p, $r_handles) = @_;
+   
+   if ($r_handles->{PENDINGBREAK})
+   {
+      return 1;
+   }
+
+   pdflib_pl::PDF_save($p);
+
+   if (defined($self->{COLOR}))
+   {
+      my ($r,$g,$b) = split ',' , $self->{COLOR};
+      pdflib_pl::PDF_setcolor($p, 'stroke', 'rgb', $r/255,$g/255,$b/255,0);
+   }
+
+   if (defined($self->{FILLCOLOR}))
+   {
+      my ($r,$g,$b) = split ',' , $self->{FILLCOLOR};
+      pdflib_pl::PDF_setcolor($p,'fill', 'rgb', $r/255,$g/255,$b/255,0);
+   }
+   
+   pdflib_pl::PDF_setlinewidth($p,$self->{WIDTH});
+
+   pdflib_pl::PDF_circle($p,$self->{X},$self->y(),$self->{R});
+
+   if (defined($self->{FILLCOLOR}))
+   {
+      pdflib_pl::PDF_fill_stroke($p);
+   }
+   else
+   {
+      pdflib_pl::PDF_stroke($p);
+   }
+   
+
+   pdflib_pl::PDF_restore($p);
+   
+
+   0;
+}
+
 
 
 ########################################################################
@@ -1005,24 +1133,41 @@ sub new
    $self->{TOGGLE} = 0;
    return $self;
 }
+
 sub render
 {
    my ($self,$p, $r_handles) = @_;
    my $ref_loop_info = $r_handles->{INNER};
+   my $ret= 0;
    
-   if (defined($ref_loop_info) && $ref_loop_info->{ALREADY_DONE}==1)
+   # If we are in a loop that is already done, just return
+   if (defined($ref_loop_info))
    {
-      return 0;
-   }
+      return 0 if ($ref_loop_info->{ALREADY_DONE}==1);
 
-   if ($self->{TOGGLE} == 1)
+      # For some reason, we toggle on whether or not to cause a page break...
+      if ($self->{TOGGLE} == 1)
+      {
+         $self->{TOGGLE} = 0;
+         $ret = 0;
+      }
+      else
+      {
+         $self->{TOGGLE} = 1;
+         $ret = 1;
+      }
+   }
+   else   # If this isn't in a loop
    {
-      $self->{TOGGLE} = 0;
-      return 0;
+      if ($self->{TOGGLE} == 0)
+      {
+         $self->{TOGGLE} = 1;
+         $ret = 1;
+      }
    }
    
-   $self->{TOGGLE} = 1;
-   1;   
+   PDF::Template::debug("<page-break name='$self->{NAME}'>\n") if ($ret==1);
+   $ret;    # 0==NOOP
 }
 
 
@@ -1039,7 +1184,7 @@ sub new
    my $class = ref($proto) || $proto;
    my $self = $class->SUPER::new(@_);
    bless ($self,$class);   
-   $self->{TXTOBJ} = PDF::Template::TextObject->new();
+   $self->{TXTOBJ} = PDF::Template::TextObject->new( PAGE => $self->{PAGE} );
    return $self;
 }
 sub render
@@ -1085,13 +1230,10 @@ sub new
 
    my $self = {
       X => 0,
-      Y => 0,
-      SCALE => 0.5,
+#      Y => 0,
+#      SCALE => 0.5,
       PATH => ''
    };
-
-
-   $self->{TXTOBJ} = PDF::Template::TextObject->new();
 
    # load in options supplied to new()
    for (my $x = 0; $x <= $#_; $x += 2) 
@@ -1101,6 +1243,15 @@ sub new
       defined($_[($x + 1)]) or die "PDF::Template::Element::Image->new() called with odd number of option parameters - should be of the form option => value";
       $self->{$opt} = $_[($x + 1)]; 
    }
+ 
+   $self->{TXTOBJ} = PDF::Template::TextObject->new( PAGE => $self->{PAGE} );
+
+# default Y to bottom of page if no other Y defined?
+   unless( defined $self->{Y_TOP} || defined $self->{Y} ){ $self->{Y} = 0; }
+
+# Next 2 lines not necessary?  for loop above has uc() in it
+   $self->{ALIGN} = uc($self->{ALIGN}) if( defined $self->{ALIGN});
+   $self->{VALIGN} = uc($self->{VALIGN}) if( defined $self->{VALIGN} );
 
    bless($self);
    return $self;
@@ -1112,10 +1263,8 @@ sub render
 {
    my ($self,$p, $r_handles) = @_;
 
-   if ($r_handles->{PENDINGBREAK})
-   {
-      return 1;
-   }
+   return 1 if ($r_handles->{PENDINGBREAK});
+   return 0 if ($r_handles->{ALREADY_DONE});
 
    my $txt = $self->{TXTOBJ}->resolve($r_handles);
    my $i = $r_handles->{IMAGES}->{$txt};
@@ -1127,6 +1276,21 @@ sub render
                    $self->{SCALE}
                    );
 
+   if (defined($self->{BORDER}))
+   {
+      pdflib_pl::PDF_save($p);
+
+      if (defined($self->{COLOR}))
+      {
+        my ($r,$g,$b) = split ',' , $self->{COLOR};
+        pdflib_pl::PDF_setcolor($p, 'both', 'rgb', $r/255,$g/255,$b/255,0);
+      }
+      pdflib_pl::PDF_rect($p,$self->{X},$self->y(),$self->{W},$self->{H});
+      pdflib_pl::PDF_stroke($p);
+
+      pdflib_pl::PDF_restore($p);
+   }
+
    0;   
 }
 
@@ -1135,11 +1299,121 @@ sub _begin_page
 {
    my ($self,$p,$r_handles) = @_;
    my $type = lc($self->{TYPE});
-   
+
+   # This allows image filenames to have variable names in them   
    my $txt = $self->{TXTOBJ}->resolve($r_handles);
+
+   # automatically resolve type if extension is obvious and type was not specified
+   if( defined $self->{TYPE}){ 
+       $type = lc($self->{TYPE}); 
+   }elsif( $txt =~ /\.(\w+)$/ ){
+       $type = lc($1);
+       $type = 'jpeg' if $type eq 'jpg';
+   }else{
+       die "PDF::Template: Undefined type for image $txt\n";
+   }
+
+   # Open the image
    my $image = pdflib_pl::PDF_open_image_file($p,$type,$txt,"", 0);
-   
+   die "PDF::Template: Can not open image file $txt \n" if $image == -1;
+
    $r_handles->{IMAGES}->{$txt} = $image;
+
+   # Determine image width and height from image
+   $self->{ IMG_H } = pdflib_pl::PDF_get_value( $p ,"imageheight", $image);
+   $self->{ IMG_W } = pdflib_pl::PDF_get_value( $p ,"imagewidth", $image);
+
+   my ($W,$H);
+   $W = $self->{W} if(defined $self->{W});
+   $H = $self->{H} if(defined $self->{H});
+
+   # Manipulate the values of our W,H, and SCALE attributes
+   # I don't really follow this section.. I got it from Mike
+   # Andreev and really need to spend some more time understanding it,
+   # especially the scale parameter
+   
+   unless( defined $self->{SCALE} )
+   { 
+      if( defined $self->{H} && defined $self->{W})
+      {
+	      if( $self->{W}/$self->{H} > $self->{IMG_W}/$self->{IMG_H} )
+         {
+	         undef $self->{W};
+	      }else{
+	         undef $self->{H};
+	      }
+      }
+
+      if( defined $self->{W} )
+      { 
+         $self->{SCALE} = $self->{W}/$self->{IMG_W}; 
+         $self->{H} = $self->{ IMG_H }*$self->{SCALE};
+      }
+      elsif( defined $self->{H} )
+      { 
+         $self->{SCALE} = $self->{H}/$self->{IMG_H}; 
+         $self->{W} = $self->{ IMG_W }*$self->{SCALE};
+      }
+      else 
+      { 
+         $self->{SCALE} = 0.5; 
+         $self->{W} = $self->{ IMG_W }*$self->{SCALE};
+         $self->{H} = $self->{ IMG_H }*$self->{SCALE};	    
+      }
+   }
+   else    # If scale was specified
+   {
+      if( !defined $self->{W} || !defined $self->{H})
+      {
+         $self->{W} = $self->{ IMG_W }*$self->{SCALE};
+         $self->{H} = $self->{ IMG_H }*$self->{SCALE};
+      }
+   }
+
+   # Do calculations for alignment...
+   
+   if( defined $W && defined $H )
+   {
+      if( defined $self->{ALIGN} )
+      {
+         if( $self->{ALIGN} eq "RIGHT")
+         {
+            $self->{X} += $W - $self->{W};
+         } 
+         elsif( $self->{ALIGN} eq "CENTER" )
+         {
+            $self->{X} += ($W - $self->{W})/2;
+         }
+      }
+
+      if( defined $self->{VALIGN} )
+      {
+         if( defined $self->{Y_TOP} )
+         {
+            if( $self->{VALIGN} eq "BOTTOM")
+            {
+               $self->{Y} =  $self->y() - ($H - $self->{H});
+               delete $self->{ Y_TOP };
+            }
+            elsif( $self->{VALIGN} eq "CENTER" )
+            {
+               $self->{Y} = $self->y() - ($H - $self->{H})/2;
+               delete $self->{ Y_TOP };
+            }
+         }
+         else
+         {
+            if( $self->{VALIGN} eq "TOP" )
+            {
+               $self->{Y} = $self->y() + ($H - $self->{H});
+            }
+            elsif( $self->{VALIGN} eq "CENTER" )
+            {
+               $self->{Y} = $self->y() + ($H - $self->{H})/2;
+            }
+         }
+      }
+   }
 
 }
 
@@ -1168,6 +1442,11 @@ sub new
    my $class = ref($proto) || $proto;
    my $self = $class->SUPER::new(@_);
    bless $self,$class;
+
+   if ( defined($self->{MAXITERS}) && $self->{MAXITERS} < 1)
+   {
+      die "<loop> MAXITERS must be >= 1\n";
+   }
    
 ##      MAXITERS=>undef,  leave undefined
 
@@ -1207,6 +1486,16 @@ sub render
    my $data = $ref_param_map->{$self->{NAME}};
    my $ref_loop_info;
    my $top_level = 0;
+
+   return 0  if $self->{'__DONE__'} == 1;            # Once a top level loop is done, it is done for good
+
+   # This next line deals with when we render even though a page break has already
+   # occurred.  This happens to enable <always> sections to display.  I'm not sure
+   # if exiting here will cause any bugs along the lines of <always> segments inside
+   # <loops>.  I can't think of a valid reason to do this right now but I might just
+   # not be thinking well.
+   
+   return 0 if $r_handles->{PENDINGBREAK} == 1;      
    
    # If we are the top level loop
    if (!defined($r_handles->{INNER}))
@@ -1245,8 +1534,7 @@ sub render
    my $done = 0;
    my $idx = $self->{DATAIDX};
 
-#print "Entering loop $self->{NAME}\n";
-
+   PDF::Template::debug "Entering loop $self->{NAME}\n";
    
    while (!$done && $idx <= $#{$data})
    {
@@ -1268,7 +1556,7 @@ sub render
          $e->set_y_base($r_handles->{GLOBALS}->{Y});
 
          $ref_loop_info->{ALREADY_DONE} = ($eidx<=$lasteidx) ? 1 : 0;
-         $r_handles->{GLOBALS}->{'__FIRST__'} = ($idx==0) ? 1 : 0;
+         $r_handles->{GLOBALS}->{'__FIRST__'} = ($idx==1) ? 1 : 0;
          $r_handles->{GLOBALS}->{'__LAST__'} = ($idx>$#{$data}) ? 1 : 0;
          $r_handles->{GLOBALS}->{'__INNER__'} = (($idx>0)&&($idx<=$#{$data})) ? 1 : 0;
          $r_handles->{GLOBALS}->{'__ODD__'} = $idx % 2;
@@ -1289,6 +1577,10 @@ sub render
       # Figure out if we are done (for this page instance)
       if ($r_handles->{GLOBALS}->{Y} < $ref_loop_info->{BOTTOM}) { $done = 1; }
       if ($idx > $#{$data}) { $done = 1; }
+      if (defined($self->{MAXITERS}))
+      {
+         if (($idx % $self->{MAXITERS}) == 0) { $done = 1;}
+      }
 
    }
 
@@ -1305,10 +1597,15 @@ sub render
    if ($top_level == 1)
    {
       delete $r_handles->{INNER};
+
+      # v0.05 bug fix for multiple top level loops      
+      if ($idx > $#{$data})
+      {
+         $self->{'__DONE__'} = 1;
+      }
    }
    
 #print "EXITING loop $self->{NAME}\n";
-
    
    ($idx<=$#{$data}) ? 1 : 0;
 }
@@ -1357,19 +1654,40 @@ sub render
       $val  = $ref_param_map->{$self->{NAME}};
    }
 
-   if ($val) { $istrue = 1; }
-   
-   if ($is eq 'TRUE')
+   if( defined $self->{VALUE} )
    {
-      if (!$istrue) { return 0; }
+      my $op;
+      if( defined $self->{OP} && $self->{OP} =~ /^(=|==|>|<|\!=|>=|<=)$/ )
+      {
+         $op = "$1";
+         $op = "==" if $op eq "=";
+      }
+      else
+      {
+         $op = "==";
+      }
+      $val = $val*1;
+      my $val1 = $self->{VALUE}*1;
+      my $res = eval( "$val $op $val1" );
+      unless( defined $res ){ warn "Condition \"$val $op $self->{VALUE}\" can not be evaluated\n"; }
+      if( !$res ){ return 0; }
    }
    else
    {
-      if ($is ne 'FALSE')
+      if ($val) { $istrue = 1; }
+
+      if ($is eq 'TRUE')
       {
-         warn "Conditional is value was [$is], defaulting to 'FALSE'\n";
+         if (!$istrue) { return 0; }
       }
-      if ($istrue) { return 0; }      
+      else
+      {
+         if ($is ne 'FALSE')
+         {
+            warn "Conditional is value was [$is], defaulting to 'FALSE'\n";
+         }
+         if ($istrue) { return 0; }      
+      }
    }
    
    # Render each of the elements / containers
@@ -1585,6 +1903,12 @@ Controls the initial presentation of the PDF when Acrobat
 opens it.  May be set to one of these values:  none, 
 bookmarks, thumbnails, fullscreen.  Defaults to 'none'.
 
+=item * info
+
+This is a hash reference containing info about the PDF document.  The has can
+contain keys such as Title, Subject, Author, Keywords, and Creator.  This information
+is visible by clicking File->Document Info->General in the Acrobat viewer.  If not
+specified, Creator and Author are set to "PDF::Template".
 
 =back 4
 
@@ -1779,7 +2103,8 @@ this value.
 
 =item * MAXITERS
 
-Not implemented.  Will force a page break every N iterations when implemented.
+If set, this determins the maximum number of rows in a loop that can appear
+per page.  If you want only 3 items to appear per page, set MAXITERS=3.
 
 =back 4
 
@@ -1843,6 +2168,7 @@ PDF supports nested bookmarks.  I have not yet implemented these.
 =head3 font
 
  <font face='Courier' size='12'></font>
+ <font face="Century Gothic" encoding="host"/>  # On win32: a truetype font
 
 Changes the current font.  Size is font size in points (72pts=1 inch).  
 Face is the name of the font.  Currently only the PDF core fonts are supported:
@@ -1879,13 +2205,22 @@ Face is the name of the font.  Currently only the PDF core fonts are supported:
 
 =back 4
 
+On Windows systems, you may specify truetype fonts by adding encoding="host" to the tag
+and specifying the name of the font in the face parameter:
+
+
 =head3 Image
 
  <image type='jpeg' scale='' x='' y=''>/file/name/here.jpg</image>
  <image type='gif'><var name='fname'></var></image>
+ <image border='1' color='255,0,0'>something.gif</image>
+ 
+Inserts an image into the document. 
 
-Inserts an image into the document. Type should be one of 
-'png','gif','jpeg', or 'tiff'.
+Type should be one of 'png','gif','jpeg', or 'tiff'.  If type is
+omitted, it will automatically be set as the lowercase file
+extension (jpg maps to jpeg).  If the file extension cannot be determined, 
+an error will be generated.
 
 The path to the image is between the start and end tags.  It
 may contain text and variables.
@@ -1893,11 +2228,20 @@ may contain text and variables.
 You may have to play with the scale parameter.  It is passed
 directly to PDFLib.
 
+Images may have borders by specifying BORDER='1'.  The border will be 
+drawn in the current color (probably black) unless you also specify
+a COLOR attribute.  Colors are specified as RGB values.
+
+Automatic scale calculation based on desired image width (W) or height (H). Only one of atributes W, H or SCALE 
+can be specified for an image.
+
 =head3 Line
 
- <line x1='' y1='' x2='' y2=''></line>
-
-Draws a line from (x1,y1) to (x2,y2).
+ <line x1='50' y1='50' x2='100' y2='100' width='2' color='0,255,0' />
+ 
+Draws a line from (x1,y1) to (x2,y2).  Width is 1 unless specified with the width
+parameter.  The line is drawn in the current color (probably black) unless an RGB 
+color is specified with the COLOR parameter.
 
 =head3 Page-Break
 
@@ -1911,12 +2255,29 @@ Inserts a page break.  If you are using it within a loop, consider
 
 to avoid an extra page break at the end of the loop.
 
+=head3 Circle
+
+  <circle x='50' y='50' r='25' color='255,0,0' fillcolor='0,0,100' width='2' />
+  
+Inserts a circle.  The 'x' and 'y' parameters are its center and
+the 'r' parameter is its radius.  If the circle is contained in a loop,
+Y will act as an offset from the loop's current Y position; otherwise,
+it will function as an absolute coordinate.
+
+The color parameter is optional and determines the color of the line.
+
+The width parameter is optional and determines the width of the line.
+It defaults to 1.
+
+The fillcolor parameter is optional and determines the color of 
+the interior of the circle.
+
 =head3 TextBox
 
  <textbox name='' border='' bgcolor='r,g,b' border=0>insert text here</textbox>
  
  <textbox>
-   Hello, <var name=username></var>, how are you today?
+   Hello, <var name='username' />, how are you today?
  </textbox>
 
 Places text on the page.
@@ -1986,6 +2347,10 @@ have an opinion.
 =head1 AUTHOR
 
 David Ferrance (dave@ferrance.com)
+
+I maintain forums at http://www.ferrance.com for the discussion of modules I have written.
+I prefer you post questions in the forums (rather than email) because they may be of use
+to other people.
 
 
 =head1 LICENSE
