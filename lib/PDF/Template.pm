@@ -6,7 +6,7 @@ BEGIN {
     use PDF::Template::Base;
     use vars qw ($VERSION @ISA);
 
-    $VERSION = '0.18';
+    $VERSION = '0.19';
     @ISA     = qw (PDF::Template::Base);
 }
 
@@ -307,7 +307,7 @@ HTML::Template.
 =head1 OVERVIEW
 
 PDF::Template is a PDF layout system that uses the same data structures as
-HTML::Template. Unlike HTML::TEmplate, this is a full layout system. This means
+HTML::Template. Unlike HTML::Template, this is a full layout system. This means
 you will have to describe where each item will be on the page. (This is in
 contrast to HTML::Template, which adds on to HTML. The layout is determined by
 the HTML, not HTML::Template.)
@@ -318,7 +318,7 @@ can have any parameter. (This prevents the creation of a DTD.) The reason for
 this is to allow scoping by parents for parameters used by children. (More on
 this later.)
 
-Each node in the document corresponds to an objects, with each parameter
+Each node in the document corresponds to an object, with each parameter
 mapping (mostly) 1 to 1 to an object attribute. Parent-child relationships are
 strictly preserved. Each parent provides a scope (similar to variable scope) to
 its children. (This is why any node can have any parameter.) If a child needs
@@ -370,17 +370,17 @@ None, that I'm aware of.
 =head1 LIMITATIONS
 
 Currently, the only PDF rendered PDF::Template supports is PDFLib (available at
-www.pdflib.com). The next release of PDF::Template will also support PDF::API2.
-Unless you need Unicode support, PDFLib Lite is sufficient (and free). Please
-see www.pdflib.com for more details.
+www.pdflib.com). An upcoming release of PDF::Template will also support
+PDF::API2. Unless you need Unicode support, PDFLib Lite is sufficient (and
+free). Please see www.pdflib.com for more details.
 
-I do know that PDFLib will not compile under AIX. This is a problem that PDFLib
-has acknowledged to me.
+I am aware that PDFLib will not compile under AIX or Cygwin. These are problems
+that PDFLib has acknowledged to me.
 
 =head1 AUTHOR
 
 Originally written by Dave Ferrance (dave@ferrance.org)
-Taken over after v0.05 by Rob Kinyon (rkinyon@columbus.rr.com)
+Taken over after v0.05 by Rob Kinyon (rob.kinyon@gmail.com)
 
 =head1 CONTRIBUTORS
 
@@ -393,6 +393,8 @@ Patches and ideas provided by:
 =item * Nathan Byrd
 
 =back 4
+
+Additionally, there is a mailing list at http://groups-beta.google.com/group/PDFTemplate
 
 =head1 COPYRIGHT
 

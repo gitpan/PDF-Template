@@ -32,7 +32,7 @@ use_unicode($use_unicode);
 WriteMakefile(
     NAME         => 'PDF::Template',
     VERSION_FROM => 'lib/PDF/Template.pm', # finds $VERSION
-    AUTHOR       => 'Rob Kinyon (rkinyon@columbus.rr.com)',
+    AUTHOR       => 'Rob Kinyon (rob.kinyon@gmail.com)',
     ABSTRACT     => 'PDF::Template',
     PREREQ_PM    => $prereqs,
 );
@@ -46,7 +46,7 @@ sub use_unicode
             qw( lib PDF Template ),
             @{$_},
         )
-    } ( [ qw( Element TextBox.pm ) ], [ qw( TextObject.pm ) ] );
+    } ( [ qw( Element TextBox.pm_ ) ], [ qw( TextObject.pm_ ) ] );
 
     foreach my $filename (@filenames)
     {
@@ -72,6 +72,7 @@ sub use_unicode
             }
         }
 
+        $filename =~ s/_$//;
         open(OUT_FILE, ">$filename")
             or die "Cannot open '$filename' for writing: $!\n";
         print OUT_FILE @lines;
