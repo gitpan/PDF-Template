@@ -1,10 +1,8 @@
+Build.PL
 MANIFEST
-LICENSE
-README
-TESTPLAN
-Todo
 Changes
 Makefile.PL
+META.yml
 lib/PDF/Template.pm
 lib/PDF/Template/Base.pm
 lib/PDF/Template/Constants.pm
@@ -35,20 +33,6 @@ lib/PDF/Template/Element/PageBreak.pm
 lib/PDF/Template/Element/TextBox.pm
 lib/PDF/Template/Element/Var.pm
 lib/PDF/Template/Element/Weblink.pm
-t/001_load.t
-t/002_simple.t
-t/003_basic.t
-t/templates/002_1/buffer.txt
-t/templates/002_1/vars.txt
-t/templates/002_1/xml.txt
-t/templates/002_2/buffer.txt
-t/templates/002_2/vars.txt
-t/templates/002_2/xml.txt
-t/templates/002_3/buffer.txt
-t/templates/002_3/vars.txt
-t/templates/002_3/xml.txt
-t/templates/003_1/buffer.txt
-t/templates/003_1/vars.txt
-t/templates/003_1/xml.txt
-t/pdflib_pl.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+t/000_interface.t
+t/001_pdftemplate.t
+t/templates/001.tmpl

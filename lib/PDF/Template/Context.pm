@@ -15,8 +15,7 @@ BEGIN {
 # nor does it represent an XML object.    Rather, every container
 # will use this object to maintain the context for its children.
 
-sub new
-{
+sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
 
@@ -30,8 +29,7 @@ sub new
     return $self;
 }
 
-sub param
-{
+sub param {
     my $self = shift;
     my ($param, $depth) = @_;
     $param = uc $param;
@@ -67,8 +65,7 @@ my %isDimension = map { $_ => 1 } qw(
     SIZE WIDTH SCALE
 );
 
-sub resolve
-{
+sub resolve {
     my $self = shift;
     my ($obj, $key, $depth) = @_;
     $key = uc $key;
@@ -159,8 +156,7 @@ sub resolve
     return;
 }
 
-sub enter_scope
-{
+sub enter_scope {
     my $self = shift;
     my ($obj) = @_;
 
@@ -175,8 +171,7 @@ sub enter_scope
     return 1;
 }
 
-sub exit_scope
-{
+sub exit_scope {
     my $self = shift;
     my ($obj, $no_delta) = @_;
 
@@ -191,8 +186,7 @@ sub exit_scope
     return 1;
 }
 
-sub get
-{
+sub get {
     my $self = shift;
     my ($dummy, $key, $depth) = @_;
     $depth ||= 0;
@@ -228,8 +222,7 @@ sub get
     return $val;
 }
 
-sub should_render
-{
+sub should_render {
     my $self = shift;
     my ($obj) = @_;
 
@@ -240,14 +233,13 @@ sub should_render
     return $self->check_end_of_page($obj);
 }
 
-sub check_end_of_page
-{
+sub check_end_of_page {
     my $self = shift;
     my ($obj) = @_;
 
     my $deltas = $obj->deltas($self);
 
-    if (($self->get($obj, 'Y') || 0) + ($deltas->{Y} || 0) < ($self->get($obj, 'END_Y') || 0))
+    if (($self->get($obj, 'Y') || 0) + $deltas->{Y} < $self->get($obj, 'END_Y'))
     {
         $self->trip_pagebreak;
         return 0;
@@ -256,15 +248,14 @@ sub check_end_of_page
     return 1;
 }
 
-sub close_images
-{
+sub close_images {
     my $self = shift;
+    my $p = $self->{PDF};
 
-    pdflib_pl::PDF_close_image($self->{PDF}, $_) for values %{$self->{IMAGES}};
+    $p->close_image($_) for values %{$self->{IMAGES}};
 }
 
-sub new_page_def
-{
+sub new_page_def {
     my $self = shift;
 
     $self->{PARAM_MAP}[0]{__PAGEDEF__}++;

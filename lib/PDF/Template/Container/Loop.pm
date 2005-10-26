@@ -26,6 +26,34 @@ sub new
     return $self;
 }
 
+sub _do_page
+{
+    my $self=shift;
+    my ($context) = @_;
+    return 0 unless $self->should_render($context);
+    unless ($self->{ITERATOR} && $self->{ITERATOR}->more_params)
+    { $self->{ITERATOR} = $self->make_iterator($context); }
+    my $iterator = $self->{ITERATOR};
+    $iterator->enter_scope;
+    while ($iterator->can_continue)
+    {
+        $iterator->next;
+        $self->SUPER::begin_page($context);
+    }
+    $iterator->exit_scope;
+    return 1;
+}
+
+sub begin_page
+{
+    _do_page(@_,'begin_page');
+}
+
+sub end_page
+{
+    _do_page(@_,'end_page');
+}
+
 sub make_iterator
 {
     my $self = shift;
@@ -165,7 +193,7 @@ the parameters specifed outside.
 
 =head1 AUTHOR
 
-Rob Kinyon (rob.kinyon@gmail.com)
+Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
 

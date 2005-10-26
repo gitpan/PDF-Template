@@ -19,6 +19,16 @@ sub new
     return $self;
 }
 
+sub _deltas {
+    my $self = shift;
+    my ($context) = @_;
+
+    return {
+        X => $context->get($self, 'W'),
+        Y => $context->get($self, 'H'),
+    };
+}
+
 my %convertImageType = (
     'jpg' => 'jpeg',
 );
@@ -35,10 +45,13 @@ sub begin_page
         die "Image does not have a filename", $/;
 
     my $image = $context->retrieve_image($txt);
+    my $p = $context->{PDF};
+
     unless ($image)
     {
         # automatically resolve type if extension is obvious and type was not specified
         my $type = $context->get($self, 'TYPE');
+
         unless ($type)
         {
             ($type) = $txt =~ /\.(\w+)$/o;
@@ -51,14 +64,14 @@ sub begin_page
         $type = lc $type;
         $type = $convertImageType{$type} if exists $convertImageType{$type};
 
-        $image = pdflib_pl::PDF_open_image_file($context->{PDF}, $type, $txt, '', 0);
+        $image = $p->open_image($type, $txt, '', 0);
         $image == -1 and die "Cannot open <image> file '$txt'", $/;
 
         $context->store_image($txt, $image);
     }
 
-    $self->{IMAGE_HEIGHT} = pdflib_pl::PDF_get_value($context->{PDF}, 'imageheight', $image);
-    $self->{IMAGE_WIDTH}  = pdflib_pl::PDF_get_value($context->{PDF}, 'imagewidth', $image);
+    $self->{IMAGE_HEIGHT} = $p->image_height($image);
+    $self->{IMAGE_WIDTH}  = $p->image_width($image);
 
     die "Image '$txt' has 0 (or less) height.", $/ if $self->{IMAGE_HEIGHT} <= 0;
     die "Image '$txt' has 0 (or less) width.", $/  if $self->{IMAGE_WIDTH} <= 0;
@@ -84,28 +97,22 @@ sub render
 
     $self->set_values($context, $txt);
 
+    my $p = $context->{PDF};
     my ($x, $y, $scale) = map { $context->get($self, $_) } qw(X Y SCALE);
 
-    pdflib_pl::PDF_place_image(
-        $context->{PDF},
-        $image, $x, $y, $scale,
-    );
+    $p->place_image( $image, $x, $y - $self->{H}, $scale );
 
     if ($context->get($self, 'BORDER'))
     {
-        pdflib_pl::PDF_save($context->{PDF});
+        $p->save_state;
 
         $self->set_color($context, 'COLOR', 'both');
 
         my ($w, $h) = map { $context->get($self, $_) } qw(W H);
 
-        pdflib_pl::PDF_rect(
-            $context->{PDF},
-            $x, $y, $w, $h,
-        );
-        pdflib_pl::PDF_stroke($context->{PDF});
-
-        pdflib_pl::PDF_restore($context->{PDF});
+        $p->rect($x, $y, $w, $h);
+        $p->stroke;
+        $p->restore_state;
     }
 
     return 1;
@@ -146,12 +153,12 @@ sub set_values
         if (defined $w)
         {
             $self->{SCALE} = $w / $self->{IMAGE_WIDTH};
-            $self->{H} = $self->{IMAGE_HEIGHT} * $scale;
+            $self->{H} = $self->{IMAGE_HEIGHT} * $self->{SCALE};
         }
         elsif (defined $h)
         {
             $self->{SCALE} = $h / $self->{IMAGE_HEIGHT};
-            $self->{W} = $self->{IMAGE_WIDTH} * $scale;
+            $self->{W} = $self->{IMAGE_WIDTH} * $self->{SCALE};
         }
         else
         {
@@ -234,7 +241,7 @@ the current X/Y position.
 
 =head1 AUTHOR
 
-Rob Kinyon (rob.kinyon@gmail.com)
+Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
 

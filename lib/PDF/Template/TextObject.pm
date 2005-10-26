@@ -8,7 +8,7 @@ BEGIN {
 
     use PDF::Template::Base;
 
-UNI_YES    use Unicode::String;
+    use Encode;
 }
 
 # This is a helper object. It is not instantiated by the user,
@@ -31,8 +31,7 @@ sub resolve
     my $self = shift;
     my ($context) = @_;
 
-UNI_YES    my $t = Unicode::String::utf8('');
-UNI_NO     my $t = '';
+    my $t = '';
 
     for my $tok (@{$self->{STACK}})
     {
@@ -40,8 +39,14 @@ UNI_NO     my $t = '';
         $val = $val->resolve($context)
             if PDF::Template::Factory::isa($val, 'VAR');
 
-UNI_YES        $t .= Unicode::String::utf8("$val");
-UNI_NO         $t .= $val;
+        my $encoding = $context->get($self, 'PDF_ENCODING');
+        if ($encoding) {
+            if (Encode::is_utf8($val)) {
+                $val = Encode::encode($encoding,$val);
+            }
+        }
+
+        $t .= $val;
     }
 
     return $t;

@@ -7,8 +7,7 @@ BEGIN {
     @ISA = qw(PDF::Template::Element);
 
     use PDF::Template::Element;
-
-UNI_YES    use Unicode::String;
+    use Encode;
 }
 
 sub new
@@ -39,8 +38,8 @@ sub get_text
     }
     else
     {
-UNI_YES        $txt = Unicode::String::utf8('');
-UNI_NO         $txt = '';
+#       $txt = Unicode::String::utf8('');
+        $txt = '';
     }
 
     return $txt;
@@ -73,6 +72,8 @@ sub render
 
     $self->set_color($context, 'COLOR', 'both');
 
+    my ($orig_x, $orig_w) = ($x, $w);
+
     if (defined(my $lmargin = $context->get($self, 'LMARGIN')))
     {
         $x += $lmargin;
@@ -94,19 +95,19 @@ sub render
 
     if ($context->get($self, 'BGCOLOR'))
     {
-        pdflib_pl::PDF_save($context->{PDF});
+        $context->{PDF}->save_state;
 
         $self->set_color($context, 'BGCOLOR', 'fill');
 
-        pdflib_pl::PDF_rect($context->{PDF}, $x, $y - $self->{TEMP_H} + $h, $w, $self->{TEMP_H});
-        pdflib_pl::PDF_fill($context->{PDF});
-        pdflib_pl::PDF_restore($context->{PDF});
+        $context->{PDF}->rect($orig_x, $y - $self->{TEMP_H} + $h, $orig_w, $self->{TEMP_H});
+        $context->{PDF}->fill;
+        $context->{PDF}->restore_state;
     }
 
     if ($context->get($self, 'BORDER'))
     {
-        pdflib_pl::PDF_rect($context->{PDF}, $x, $y - $self->{TEMP_H} + $h, $w, $self->{TEMP_H});
-        pdflib_pl::PDF_stroke($context->{PDF});
+        $context->{PDF}->rect($orig_x, $y - $self->{TEMP_H} + $h, $orig_w, $self->{TEMP_H});
+        $context->{PDF}->stroke;
     }
 
     $self->set_color($context, 'COLOR', 'both', 1);
@@ -132,18 +133,14 @@ sub _display_doublebyte
 
     if ($j eq 'right')
     {
-UNI_YES        $x -= $str->length * $font_size;
-UNI_NO         $x -= length($str) * $font_size;
+        $x -= length($str) * $font_size;
     }
     elsif ($j eq 'center')
     {
-UNI_YES        $x -= ($str->length / 2) * $font_size;
-UNI_NO         $x -= (length($str) / 2) * $font_size;
+        $x -= (length($str) / 2) * $font_size;
     }
 
-UNI_YES    Unicode::String->stringify_as('ucs2');
-UNI_YES    pdflib_pl::PDF_show_xy($p, $str->as_string, $x, $y);
-UNI_NO     pdflib_pl::PDF_show_xy($p, $str, $x, $y);
+    $p->show_xy($str, $x, $y);
 
     return 0;
 }
@@ -154,21 +151,26 @@ sub _show_boxed
     my $context = shift;
 
     my $encoding = $context->get($self, 'PDF_ENCODING') || 'host';
-    if ($encoding eq 'host')
-    {
-UNI_YES        Unicode::String->stringify_as('latin1');
-UNI_NO         my $str = shift;
-UNI_YES        my $leftovers = pdflib_pl::PDF_show_boxed($context->{PDF}, $str->as_string, @_);
-UNI_NO         my $leftovers = pdflib_pl::PDF_show_boxed($context->{PDF}, $str, @_);
 
-UNI_YES        $leftovers++ if $leftovers && $leftovers == $str->length - 1;
-UNI_NO         $leftovers++ if $leftovers && $leftovers == length($str) - 1;
+    if (my $text_encoding = $context->get($self, 'TEXT_ENCODING'))
+    {
+        require Encode::compat if $] <= 5.008;
+        require Encode;
+        unshift @_, Encode::decode($text_encoding => shift(@_))
+          unless Encode::is_utf8($_[0]);
+    }
+
+    unless ( Encode::is_utf8($_[0]) ) {
+        my $str = shift;
+        my $leftovers = $context->{PDF}->show_boxed($str, @_);
+
+        $leftovers++ if $leftovers && $leftovers == length($str) - 1;
         return $leftovers;
     }
 
     my ($p, $str, $x, $y, $w, $h, $j, $m) = ($context->{PDF}, @_);
 
-    my $font_size = pdflib_pl::PDF_get_value($p, 'fontsize', undef);
+    my $font_size = $p->font_size;
     die "Fontsize of 0!", $/ if $font_size <= 0;
 
     if ($w == 0 && $h == 0)
@@ -191,26 +193,26 @@ UNI_NO         $leftovers++ if $leftovers && $leftovers == length($str) - 1;
         $start_x = $right if $j eq 'right';
         $start_x = $mid if $j eq 'center';
 
-UNI_YES        if ($str->length <= $chars_per_line)
-UNI_NO         if (length($str) <= $chars_per_line)
+#       if ($str->length <= $chars_per_line)
+        if (length($str) <= $chars_per_line)
         {
             return 0 if $m eq 'blind';
             return $self->_display_doublebyte($p, $str, $start_x, $current_y, $j, $font_size);
         }
 
-UNI_YES        my $str_this_line = $str->substr(0, $chars_per_line);
-UNI_NO         my $str_this_line = substr($str, 0, $chars_per_line);
+#       my $str_this_line = $str->substr(0, $chars_per_line);
+        my $str_this_line = substr($str, 0, $chars_per_line);
 
         $self->_display_doublebyte($p, $str_this_line, $start_x, $current_y, $j, $font_size)
             unless $m eq 'blind';
 
         $current_y -= $font_size;
-UNI_YES        $str = $str->substr($chars_per_line);
-UNI_NO         $str = substr($str, $chars_per_line);
+#       $str = $str->substr($chars_per_line);
+        $str = substr($str, $chars_per_line);
     }
 
-UNI_YES    return $str->length;
-UNI_NO     return length($str);
+#   return $str->length;
+    return length($str);
 }
 
 sub show_boxed
@@ -218,15 +220,15 @@ sub show_boxed
     my $self = shift;
     my ($context, $str, $x, $y, $w, $h, $align, $mode) = @_;
 
-    my $fsize = pdflib_pl::PDF_get_value($context->{PDF}, "fontsize", undef);
+    my $fsize = $context->{PDF}->font_size;
     $fsize = 0 if $fsize < 0;
 
-UNI_YES    return $h unless $str->length && ($fsize && $h / $fsize >= 1);
-UNI_NO     return $h unless length($str) && ($fsize && $h / $fsize >= 1);
+#   return $h unless $str->length && ($fsize && $h / $fsize >= 1);
+    return $h unless length($str) && ($fsize && $h / $fsize >= 1);
 
     my $total_h = $h;
-UNI_YES    my $excess_txt = Unicode::String::utf8('');
-UNI_NO     my $excess_txt = '';
+#   my $excess_txt = Unicode::String::utf8('');
+    my $excess_txt = '';
 
     LOOP:
     {
@@ -235,23 +237,19 @@ UNI_NO     my $excess_txt = '';
             $x, $y, $w, $h,
             $align, $mode,
         );
-        die "Invalid return ($leftovers) from pdflib_pl::PDF_show_boxed() on string '$str'", $/
-UNI_YES            if $leftovers > $str->length;
-UNI_NO             if $leftovers > length($str);
+        die "Invalid return ($leftovers) from _show_boxed() on string '$str'", $/
+            if $leftovers > length($str);
 
         last LOOP if $context->get($self, 'TRUNCATE_TEXT');
 
-UNI_YES        if ($leftovers < $str->length)
-UNI_NO         if ($leftovers < length($str))
+        if ($leftovers < length($str))
         {
             last LOOP unless $excess_txt || $leftovers;
 
-UNI_YES            $str = ($leftovers ? $str->substr(-1 * $leftovers) : '' ) . $excess_txt;
-UNI_NO             $str = ($leftovers ? substr($str, -1 * $leftovers) : '' ) . $excess_txt;
+            $str = ($leftovers ? substr($str, -1 * $leftovers) : '' ) . $excess_txt;
             $excess_txt = '';
 
-UNI_YES            $str = $str->substr(1) while $str->substr(0, 1) =~ /^[\r\n\s]+/o;
-UNI_NO             $str =~ s/^[\r\n\s]+//go;
+            $str =~ s/^[\r\n\s]+//go;
 
             $y -= $h;
             $total_h += $h;
@@ -261,12 +259,9 @@ UNI_NO             $str =~ s/^[\r\n\s]+//go;
 
         last LOOP unless $leftovers;
 
-UNI_YES        $excess_txt = $str->chop . $excess_txt;
-UNI_YES        $excess_txt = $str->chop . $excess_txt
-UNI_YES            while $str->substr(-1) =~ /^[\r\n\s]$/o;
-UNI_NO         $excess_txt = chop($str) . $excess_txt;
-UNI_NO         $excess_txt = chop($str) . $excess_txt
-UNI_NO             while $str =~ /[\r\n\s]$/o;
+        $excess_txt = chop($str) . $excess_txt;
+        $excess_txt = chop($str) . $excess_txt
+            while $str =~ /[\r\n\s]$/o;
 
         redo LOOP;
     }
@@ -403,7 +398,7 @@ same textbox.)
 
 =head1 AUTHOR
 
-Rob Kinyon (rob.kinyon@gmail.com)
+Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
 

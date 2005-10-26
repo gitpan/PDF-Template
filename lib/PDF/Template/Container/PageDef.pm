@@ -136,13 +136,11 @@ sub render
     while (!$done)
     {
         $self->begin_page($context);
-
-        pdflib_pl::PDF_begin_page($context->{PDF}, $pwidth, $pheight);
+        $context->{PDF}->begin_page($pwidth, $pheight);
 
         $done = $self->iterate_over_children($context);
 
-        pdflib_pl::PDF_end_page($context->{PDF});
-
+        $context->{PDF}->end_page;
         $self->end_page($context);
 
         $context->increment_pagenumber unless $context->get($self, 'NOPAGENUMBER');
@@ -233,7 +231,7 @@ PDFTEMPLATE node. It is sometimes useful to have something like:
 
 =head1 AUTHOR
 
-Rob Kinyon (rob.kinyon@gmail.com)
+Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
 

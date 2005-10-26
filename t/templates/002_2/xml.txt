@@ -1,3 +1,0 @@
-<pdftemplate pagesize="Letter">
-  <pagedef/>
-</pdftemplate>

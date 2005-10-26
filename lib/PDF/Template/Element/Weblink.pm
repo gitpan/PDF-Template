@@ -30,11 +30,7 @@ sub render
         $context->get($self, $_) || 0
     } qw( X1 Y1 X2 Y2 );
 
-    pdflib_pl::PDF_add_weblink(
-        $context->{PDF},
-        @dimensions,
-        $url,
-    );
+    $context->{PDF}->add_weblink( @dimensions, $url );
 
     return 1;
 }
@@ -92,7 +88,7 @@ URL attribute should be added to various nodes, such as IMAGE, TEXTBOX, and ROW.
 
 =head1 AUTHOR
 
-Rob Kinyon (rob.kinyon@gmail.com)
+Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
 

@@ -19,26 +19,7 @@ sub set_color
     return 1 unless $color;
 
     my @colors = map { $_ / 255 } split /,\s*/, $color, 3;
-
-    if ($context->{PDF_VERSION} >= 4)
-    {
-        pdflib_pl::PDF_setcolor($context->{PDF}, $mode, 'rgb', @colors, 0);
-    }
-    else
-    {
-        if ($mode eq 'fill')
-        {
-            pdflib_pl::PDF_setrgbcolor_fill($context->{PDF}, @colors);
-        }
-        elsif ($mode eq 'stroke')
-        {
-            pdflib_pl::PDF_setrgbcolor_stroke($context->{PDF}, @colors);
-        }
-        else # ($mode eq 'both')
-        {
-            pdflib_pl::PDF_setrgbcolor($context->{PDF}, @colors);
-        }
-    }
+    $context->{PDF}->color($mode, 'rgb', @colors);
 
     return 1;
 }

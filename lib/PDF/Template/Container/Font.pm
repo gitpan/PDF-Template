@@ -25,6 +25,7 @@ sub render
 {
     my $self = shift;
     my ($context) = @_;
+    my $p = $context->{PDF};
 
     my $size = $context->get($self, 'H') ||
         $context->get($self, 'SIZE') ||
@@ -35,11 +36,7 @@ sub render
     my $font = $context->retrieve_font($face);
     $font == -1 && die "Font not found for '$face' by the time <font> was rendered", $/;
 
-    pdflib_pl::PDF_setfont(
-        $context->{PDF},
-        $font,
-        $size,
-    );
+    $p->font($font, $size);
 
     push @current_font, [ $font, $size ];
 
@@ -51,7 +48,7 @@ sub render
 
     return $child_success unless @current_font;
 
-    pdflib_pl::PDF_setfont($context->{PDF}, @{$current_font[-1]});
+    $p->font(@{$current_font[-1]});
 
     return $child_success;
 }
@@ -69,16 +66,12 @@ sub begin_page
     unless ($context->retrieve_font($face))
     {
         my $encoding = $context->get($self, 'PDF_ENCODING') || 'host';
-#        $self->_validate_option('FACE', \$face)
-#            unless $encoding eq 'host';
 
-        my $font = pdflib_pl::PDF_findfont(
-            $context->{PDF},
+        my $font = $context->{PDF}->find_font(
             $face,
             $encoding,
             $context->get($self, 'EMBED'),
-        );
-        $font == -1 && die "Font not found for '$face' by the time <font> was rendered", $/;
+        ) or die "Font not found for '$face' by the time <font> was rendered", $/;
 
         $context->store_font($face, $font);
     }
@@ -161,7 +154,7 @@ deprecated and will be removed in a future release.
 
 =head1 AUTHOR
 
-Rob Kinyon (rob.kinyon@gmail.com)
+Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
 

@@ -95,7 +95,7 @@ This will cause a pagebreak to occur at the spot the node is.
 
 =head1 AUTHOR
 
-Rob Kinyon (rob.kinyon@gmail.com)
+Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
 

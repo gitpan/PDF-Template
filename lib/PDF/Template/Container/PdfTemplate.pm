@@ -9,8 +9,7 @@ BEGIN {
     use PDF::Template::Container;
 }
 
-sub new
-{
+sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
 
@@ -20,16 +19,14 @@ sub new
     return $self;
 }
 
-sub should_render
-{
+sub should_render {
 #    my $self = shift;
 #    my ($context) = @_;
 
     return 1;
 }
 
-sub render
-{
+sub render {
     my $self = shift;
     my ($context) = @_;
 
@@ -43,43 +40,39 @@ sub render
     return $child_success;
 }
 
-sub preprocess
-{
-    my $self = shift;
-    my ($context) = @_;
-
-    $self->enter_scope($context);
-
-    $context->{PARAM_MAP}[0]{__LAST_PAGE__} = 0;
-    unless ($context->get($self, 'NOLASTPAGE'))
-    {
-        my $old_PDF = $context->{PDF};
-
-        my $p = pdflib_pl::PDF_new();
-        pdflib_pl::PDF_open_file($p, '') == -1 &&
-            die "pdflib_pl::PDF_open_file could not open buffer.", $/;
-
-        $context->{PDF} = $p;
-
-        $context->{CALC_LAST_PAGE} = 1;
-        $self->SUPER::render($context);
-        $context->{CALC_LAST_PAGE} = 0;
-
-        pdflib_pl::PDF_close($p);
-
-        $self->reset;
-        $context->delete_fonts;
-
-        $context->{PDF} = $old_PDF;
-        $context->{PARAM_MAP}[0]{__LAST_PAGE__} = $context->{PARAM_MAP}[0]{__PAGE__} - 1;
-        $context->{PARAM_MAP}[0]{__PAGE__} = 1;
-        $context->{PARAM_MAP}[0]{__PAGEDEF__} = 0;
-    }
-
-    $self->exit_scope($context, 1);
-
-    return 1;
-}
+#sub preprocess {
+#    my $self = shift;
+#    my ($context) = @_;
+#
+#    $self->enter_scope($context);
+#
+#    $context->{PARAM_MAP}[0]{__LAST_PAGE__} = 0;
+#    unless ($context->get($self, 'NOLASTPAGE')) {
+#        my $old_PDF = $context->{PDF};
+#
+#        my $p = PDF::Writer->new;
+#        $p->open() or die "Could not open buffer.", $/;
+#
+#        $context->{PDF} = $p;
+#
+#        $context->{CALC_LAST_PAGE} = 1;
+#        $self->SUPER::render($context);
+#        $context->{CALC_LAST_PAGE} = 0;
+#
+#        $p->close;
+#        $self->reset;
+#        $context->delete_fonts;
+#
+#        $context->{PDF} = $old_PDF;
+#        $context->{PARAM_MAP}[0]{__LAST_PAGE__} = $context->{PARAM_MAP}[0]{__PAGE__} - 1;
+#        $context->{PARAM_MAP}[0]{__PAGE__} = 1;
+#        $context->{PARAM_MAP}[0]{__PAGEDEF__} = 0;
+#    }
+#
+#    $self->exit_scope($context, 1);
+#
+#    return 1;
+#}
 
 1;
 __END__
@@ -129,7 +122,7 @@ None
 
 =head1 AUTHOR
 
-Rob Kinyon (rob.kinyon@gmail.com)
+Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
 

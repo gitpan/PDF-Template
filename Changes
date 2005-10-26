@@ -1,9 +1,27 @@
 Revision history for Perl distribution PDF::Template
 
-0.21 Tue Jan 11 10:00:00 2005
+0.99_01 ???
+    - Merge Autrijus's changes so that PDF::Template now targets PDF::Writer
+    instead of directly targeting pdflib_pl
+
+0.25 Mon Jun 6 12:17 2005
+    - Fixed error in looping.  PDF::Template now correctly loops during begin_page and end_page calls.
+
+0.24 Mon Jun 6 12:05 2005
+    - Fixed conditional testing to correspond to the behavior of HTML::Template 
+   	It now correctly handles undefined variables.
+    
+0.23 Mon Jun 6 11:38:00 2005
+    - Set 72pts/inch (which is correct)
+    - Fixed textbox alignment problem.
+
+0.22 Tue Jan 11 11:00:00 2005
     - Added tests to demonstrate bug submitted by Brian T. Wightman
     - Fixed bug in conditionals submitted by Brian T. Wightman
       - Conditionals now correctly handle string comparisons
+
+0.21 Mon Dec 06 10:30:00 2004
+    - Fixed tests to run under Perl 5.6.2 (do wasn't working correctly)
 
 0.20 Thu Dec 02 10:30:00 2004
     - Fixed tests so that they run correctly
@@ -49,4 +67,3 @@ Revision history for Perl distribution PDF::Template
     - Support for CJK fonts
     - Maintenance fixes
     - Turnover of maintenance from David Ferrance to Rob Kinyon
-

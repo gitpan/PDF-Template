@@ -36,7 +36,7 @@ sub render
         $txt = 'undefined';
     }
 
-    pdflib_pl::PDF_add_bookmark($context->{PDF}, $txt, 0, 0);
+    $context->{PDF}->add_bookmark($txt, 0, 0);
 
     return 1;
 }
@@ -85,7 +85,7 @@ That now adds a bookmark for that spot to the PDF, called "Some Bookmark".
 
 =head1 AUTHOR
 
-Rob Kinyon (rob.kinyon@gmail.com)
+Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
 

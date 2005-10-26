@@ -19,8 +19,7 @@ sub render
     return 1 if $context->{CALC_LAST_PAGE};
 
     my $p = $context->{PDF};
-
-    pdflib_pl::PDF_save($p);
+    $p->save_state;
 
     $self->set_color($context, 'COLOR', 'both');
 
@@ -28,12 +27,12 @@ sub render
 
     my $width = $context->get($self, 'WIDTH') || 1;
 
-    pdflib_pl::PDF_setlinewidth($p, $width);
-    pdflib_pl::PDF_moveto($p, $vals->{X1}, $vals->{Y1});
-    pdflib_pl::PDF_lineto($p, $vals->{X2}, $vals->{Y2});
-    pdflib_pl::PDF_stroke($p);
+    $p->linewidth($width);
+    $p->move($vals->{X1}, $vals->{Y1});
+    $p->line($vals->{X2}, $vals->{Y2});
+    $p->stroke;
 
-    pdflib_pl::PDF_restore($p);
+    $p->restore_state;
 
     return 1;
 }
@@ -160,7 +159,7 @@ top to the spot 3" from the left and 2" from the top.
 
 =head1 AUTHOR
 
-Rob Kinyon (rob.kinyon@gmail.com)
+Rob Kinyon (rkinyon@columbus.rr.com)
 
 =head1 SEE ALSO
 
