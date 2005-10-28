@@ -68,14 +68,14 @@ sub conditional_passes
     {
         if ($is eq 'TRUE')
         {
-            return !$istrue;
+            return $istrue;
         }
         else
         {
             warn "Conditional 'is' value was [$is], defaulting to 'FALSE'" . $/
                 if $is ne 'FALSE';
 
-            return $istrue;
+            return !$istrue;
         }
     }
 
@@ -174,7 +174,7 @@ conditional will branch appropriately. If NAME has no value, this will fail.
 find the variable defined by NAME. If it exists and is true, the condition
 will succeed. Otherwise, it will fail.
 
-=back 4
+=back
 
 =head1 CHILDREN
 

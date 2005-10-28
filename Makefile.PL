@@ -9,6 +9,7 @@ WriteMakefile
           'VERSION_FROM' => 'lib/PDF/Template.pm',
           'PREREQ_PM' => {
                            'Test::More' => '0.47',
+                           'IO::Scalar' => '0.01',
                            'PDF::Writer' => '0.05',
                            'Encode' => '0.01'
                          }

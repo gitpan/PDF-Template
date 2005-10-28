@@ -5,7 +5,7 @@ use warnings;
 
 use base 'PDF::Template::Base';
 
-our $VERSION = '0.29_01';
+our $VERSION = '0.29_02';
 
 use PDF::Writer;
 
@@ -380,21 +380,21 @@ This will set the parameters that PDF::Template will use to merge the template
 with. This method is identical to the HTML::Template or Template Toolkit
 method of the same name.
 
-=item C<write_file( $filename )>
+=item * C<write_file( $filename )>
 
 This will write the rendered PDF to the file specified in $filename.
 
-=item C<get_buffer()>
+=item * C<get_buffer()>
 
 This will return the rendered PDF stringified in a form appropriate for
 returning over an HTTP connection.
 
-=item C<output()>
+=item * C<output()>
 
 This is a synonym for C<get_buffer()> provided for HTML::Template
 compatibility.
 
-=item C<register( ... )>
+=item * C<register( ... )>
 
 XXX
 

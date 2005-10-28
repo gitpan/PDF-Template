@@ -100,7 +100,7 @@ PDF::Template::Container
 =item * NOLASTPAGE - If this is set to true, then __LAST_PAGE__ will not be
 calculated. This can provide a decent speed improvement.
 
-=back 4
+=back
 
 =head1 CHILDREN
 

@@ -21,6 +21,8 @@ sub enter_scope
     my $self = shift;
     my ($context) = @_;
 
+    $self->SUPER::enter_scope($context);
+
     {
         no strict 'refs';
 
@@ -29,7 +31,7 @@ sub enter_scope
         *{"${class}::check_end_of_page"} = sub { return 1 };
     }
 
-    return $self->SUPER::enter_scope($context);
+    return 1;
 }
 
 sub exit_scope

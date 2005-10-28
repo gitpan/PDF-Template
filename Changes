@@ -1,6 +1,11 @@
 Revision history for Perl distribution PDF::Template
 
-0.99_01 ???
+0.29_02 Fri Oct 28 2005
+    - Fixed several bugs as documented in t/bug_0001.t and t/bug_0002.t.
+      - Bugs reported by flitman (Thank you!)
+    - IO::Scalar is now required to build PDF::Template
+
+0.29_01 Wed Oct 26 2005
     - Merge Autrijus's changes so that PDF::Template now targets PDF::Writer
     instead of directly targeting pdflib_pl
 

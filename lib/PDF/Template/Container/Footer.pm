@@ -14,12 +14,14 @@ sub enter_scope
     my $self = shift;
     my ($context) = @_;
 
+    $self->SUPER::enter_scope($context);
+
     @{$self}{qw/OLD_X OLD_Y/} = map { $context->get($self, $_) } qw(X Y);
 
     $context->{X} = 0;
     $context->{Y} = $context->get($self, 'FOOTER_HEIGHT');
 
-    return $self->SUPER::enter_scope($context);
+    return 1;
 }
 
 1;
@@ -48,7 +50,7 @@ PDF::Template::Container::Margin
 =item * FOOTER_HEIGHT - the amount reserved for the footer from the bottom of
 the page.
 
-=back 4
+=back
 
 =head1 CHILDREN
 

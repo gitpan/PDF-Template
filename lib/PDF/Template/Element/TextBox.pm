@@ -327,7 +327,7 @@ This is the orientation of the text in the textbox. Legal values are:
 
 =item * Full (NOT IMPLEMENTED)
 
-=back 4
+=back
 
 JUSTIFY is provided for backwards compatibility, and is deprecated.
 
@@ -369,7 +369,7 @@ this behavior is undesirable.
 Set this to a true value and the height value will be a requirement, not an
 option.
 
-=back 4
+=back
 
 =head1 CHILDREN
 

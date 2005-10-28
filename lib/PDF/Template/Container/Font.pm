@@ -107,7 +107,7 @@ PDFLib. (q.v. for more details)
 
 =item * H - the point size of the font. 
 
-=back 4
+=back
 
 =head1 CHILDREN
 

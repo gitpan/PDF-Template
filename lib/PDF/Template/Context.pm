@@ -37,8 +37,7 @@ sub param {
 
     my $val = undef;
     my $found = 0;
-    for my $map (reverse @{$self->{PARAM_MAP}})
-    {
+    for my $map (reverse @{$self->{PARAM_MAP}}) {
         next unless exists $map->{$param};
         $depth--, next if $depth;
 
@@ -74,8 +73,7 @@ sub resolve {
     my $obj_val = $obj->{$key};
 
     my $is_param = 0;
-    if ($obj->{$key} =~ /^\$(\S+)$/o)
-    {
+    if ($obj->{$key} =~ /^\$(\S+)$/o) {
         $is_param = 1;
         $obj_val = $self->param($1)
     }
@@ -92,35 +90,29 @@ sub resolve {
     my ($op, $val, $unit) = $obj_val =~ m!^\s*([\+\*\/\-])?\s*([\d.]*\d)\s*([a-z%]+)?\s*$!oi;
     $op ||= '';
 
-    if ($unit)
-    {
+    if ($unit) {
         # Only the first character of the unit is useful, and it needs to be uppercase to key
         # into %PointsPer.
         my $uom = uc substr($unit, 0, 1);
 
-        if ($uom eq '%')
-        {
+        if ($uom eq '%') {
 #GGG Is this all that's needed?
-            if ($key eq 'W')
-            {
+            if ($key eq 'W') {
                 $val *= ($self->get($obj, 'PAGE_WIDTH') -
                             $self->get($obj, 'LEFT_MARGIN') -
                             $self->get($obj, 'RIGHT_MARGIN'));
             }
-            elsif ($key eq 'H')
-            {
+            elsif ($key eq 'H') {
                 $val *= ($self->get($obj, 'PAGE_HEIGHT') -
                             $self->get($obj, 'HEADER_HEIGHT') -
                             $self->get($obj, 'FOOTER_HEIGHT'));
             }
             $val /= 100;
         }
-        elsif (exists $PointsPer{$uom})
-        {
+        elsif (exists $PointsPer{$uom}) {
             $val *= $PointsPer{$uom};
         }
-        else
-        {
+        else {
             warn "'$unit' is not a recognized unit of measurement.", $/;
         }
 
@@ -142,8 +134,7 @@ sub resolve {
     return $val if $op eq '/' and $val == 0;
 
     my $new_val;
-    for ($op)
-    {
+    for ($op) {
         /^\+$/ && do { $new_val = ($prev_val + $val); last; };
         /^\-$/ && do { $new_val = ($prev_val - $val); last; };
         /^\*$/ && do { $new_val = ($prev_val * $val); last; };
@@ -162,8 +153,7 @@ sub enter_scope {
 
     push @{$self->{STACK}}, $obj;
 
-    for my $key (qw(X Y))
-    {
+    for my $key (qw(X Y)) {
         next unless exists $obj->{$key};
         $self->{$key} = $self->resolve($obj, $key);
     }
@@ -175,8 +165,7 @@ sub exit_scope {
     my $self = shift;
     my ($obj, $no_delta) = @_;
 
-    unless ($no_delta)
-    {
+    unless ($no_delta) {
         my $deltas = $obj->deltas($self);
         $self->{$_} += $deltas->{$_} for keys %$deltas;
     }
@@ -195,8 +184,7 @@ sub get {
     return unless @{$self->{STACK}};
 
     my $obj = $self->{STACK}[-1];
-    if (exists $obj->{"TEMP_$key"})
-    {
+    if (exists $obj->{"TEMP_$key"}) {
         my $val = delete $obj->{"TEMP_$key"};
         return $val;
     }
@@ -205,8 +193,7 @@ sub get {
 
     my $val = undef;
     my $this_depth = $depth;
-    foreach my $e (reverse @{$self->{STACK}})
-    {
+    foreach my $e (reverse @{$self->{STACK}}) {
         next unless exists $e->{$key};
         next if $this_depth-- > 0;
 
@@ -239,8 +226,10 @@ sub check_end_of_page {
 
     my $deltas = $obj->deltas($self);
 
-    if (($self->get($obj, 'Y') || 0) + $deltas->{Y} < $self->get($obj, 'END_Y'))
-    {
+    if (
+        ($self->get($obj, 'Y') || 0) + ($deltas->{Y} || 0)
+            < ($self->get($obj, 'END_Y') || 0)
+    ) {
         $self->trip_pagebreak;
         return 0;
     }

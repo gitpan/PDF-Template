@@ -216,7 +216,7 @@ This is a boolean, used to specify if you want to draw a border around the image
 =item * COLOR
 Ignored unless BORDER is specified. This is the color of the border.
 
-=back 4
+=back
 
 =head1 CHILDREN
 

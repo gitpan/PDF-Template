@@ -65,31 +65,31 @@ our %Verify = (
     'PAGESIZE' => {
         '__DEFAULT__' => 'Letter',
         'Letter' => {
-            PAGE_WIDTH => 8.5 * $PointsPer{I},
+            PAGE_WIDTH  => 8.5 * $PointsPer{I},
             PAGE_HEIGHT => 11 * $PointsPer{I},
         },
         'Legal' => {
-            PAGE_WIDTH => 8.5 * $PointsPer{I},
+            PAGE_WIDTH  => 8.5 * $PointsPer{I},
             PAGE_HEIGHT => 14 * $PointsPer{I},
         },
         'A0' => {
-            PAGE_WIDTH => 2380,
+            PAGE_WIDTH  => 2380,
             PAGE_HEIGHT => 3368,
         },
         'A1' => {
-            PAGE_WIDTH => 1684,
+            PAGE_WIDTH  => 1684,
             PAGE_HEIGHT => 2380,
         },
         'A2' => {
-            PAGE_WIDTH => 1190,
+            PAGE_WIDTH  => 1190,
             PAGE_HEIGHT => 1684,
         },
         'A3' => {
-            PAGE_WIDTH => 1190,
-            PAGE_HEIGHT => 842,
+            PAGE_WIDTH  => 842,
+            PAGE_HEIGHT => 1190,
         },
         'A4' => {
-            PAGE_WIDTH => 595,
+            PAGE_WIDTH  => 595,
             PAGE_HEIGHT => 842,
         },
     },

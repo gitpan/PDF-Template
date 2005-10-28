@@ -168,7 +168,7 @@ PDF::Template::Container
 
 =item * NAME - the name of a parameter that points to an array of hashes.
 
-=back 4
+=back
 
 =head1 CHILDREN
 

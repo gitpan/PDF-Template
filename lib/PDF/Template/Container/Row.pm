@@ -14,9 +14,11 @@ sub enter_scope
     my $self = shift;
     my ($context) = @_;
 
+    $self->SUPER::enter_scope($context);
+
     $context->{X} = $context->get($self, 'LEFT_MARGIN');
 
-    return $self->SUPER::enter_scope($context);
+    return 1;
 }
 
 sub deltas
@@ -69,7 +71,7 @@ PDF::Template::Container
 =item * LEFT_MARGIN - If specifed, the row will start rendering here. Otherwise,
 it will default to the PAGEDEF's LEFT_MARGIN.
 
-=back 4
+=back
 
 =head1 CHILDREN
 

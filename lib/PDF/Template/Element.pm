@@ -51,7 +51,7 @@ This includes (but may not be limited to):
 
 =item * FILLCOLOR
 
-=back 4
+=back
 
 =head1 SEE ALSO
 

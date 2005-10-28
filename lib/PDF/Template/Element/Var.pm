@@ -37,7 +37,7 @@ PDF::Template::Element
 =item * NAME
 This is the name of the parameter to substitute
 
-=back 4
+=back
 
 =head1 CHILDREN
 

@@ -65,7 +65,7 @@ The URL to go to, when clicked
 
 The dimensions of the clickable area
 
-=back 4
+=back
 
 =head1 CHILDREN
 

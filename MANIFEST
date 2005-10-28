@@ -35,4 +35,7 @@ lib/PDF/Template/Element/Var.pm
 lib/PDF/Template/Element/Weblink.pm
 t/000_interface.t
 t/001_pdftemplate.t
+t/998_pod.t
 t/templates/001.tmpl
+t/bug_0001.t
+t/bug_0002.t

@@ -14,10 +14,12 @@ sub enter_scope
     my $self = shift;
     my ($context) = @_;
 
+    $self->SUPER::enter_scope($context);
+
     $self->{OLD_TRIP} = $context->pagebreak_tripped;
     $context->reset_pagebreak;
 
-    return $self->SUPER::enter_scope($context);
+    return 1;
 }
 
 sub exit_scope

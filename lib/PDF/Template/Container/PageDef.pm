@@ -35,7 +35,7 @@ sub find_margin_heights
     $sub = sub {
         my $obj = shift;
 
-        $obj->enter_scope($context);
+        $obj->enter_scope($context) unless $obj->isa('PAGEDEF');
 
         if ($obj->isa('HEADER'))
         {
@@ -52,7 +52,7 @@ sub find_margin_heights
             $sub->($_) for grep { $_->isa('CONTAINER') } @{$obj->{ELEMENTS}};
         }
 
-        $obj->exit_scope($context, 1);
+        $obj->exit_scope($context, 1) unless $obj->isa('PAGEDEF');
     };
 
     $sub->($self);
@@ -68,6 +68,8 @@ sub enter_scope
     my $self = shift;
     my ($context) = @_;
 
+    $self->SUPER::enter_scope( $context );
+
     my ($pheight, $pwidth) = map { $context->get($self, $_) } qw(PAGE_HEIGHT PAGE_WIDTH);
     unless (defined $pheight && defined $pwidth)
     {
@@ -82,7 +84,6 @@ sub enter_scope
     }
 
     # swap dimensions if landscape
-    my ($orig_width, $orig_height);
     if ($context->get($self, 'LANDSCAPE'))
     {
         ($pheight, $pwidth) = ($pwidth, $pheight);
@@ -92,7 +93,7 @@ sub enter_scope
             = @{$self}{qw(PAGE_WIDTH PAGE_HEIGHT)}
     }
 
-    return $self->SUPER::enter_scope($context);
+    return 1;
 }
 
 sub exit_scope
@@ -103,7 +104,7 @@ sub exit_scope
     @{$self}{qw(PAGE_HEIGHT PAGE_WIDTH)} = delete @{$self}{qw(_ORIG_HEIGHT _ORIG_WIDTH)}
         if exists $self->{_ORIG_HEIGHT};
 
-    $self->SUPER::exit_scope($context);
+    return $self->SUPER::exit_scope($context);
 }
 
 sub begin_page
@@ -124,9 +125,10 @@ sub render
     my $self = shift;
     my ($context) = @_;
 
+    my ($header_h, $footer_h) = $self->find_margin_heights($context);
+
     my ($pheight, $pwidth) = map { $context->get($self, $_) } qw(PAGE_HEIGHT PAGE_WIDTH);
 
-    my ($header_h, $footer_h) = $self->find_margin_heights($context);
     $self->{START_Y} = $pheight - $header_h;
     $self->{END_Y}   = $footer_h;
 
@@ -191,7 +193,7 @@ a true value, then PAGE_HEIGHT and PAGE_WIDTH will be swapped.
 =item * NOPAGENUMBER - If this is set to a true value, then this pagedef will
 not increment the __PAGE__ parameter. Useful for title pages and the like.
 
-=back 4
+=back
 
 =head1 CHILDREN
 

@@ -110,7 +110,7 @@ This is the color the circle should be filled in with. Defaults to none.
 =item * WIDTH
 This is the width of the line used to draw the circle. Defaults to 1 pixel.
 
-=back 4
+=back
 
 =head1 CHILDREN
 

@@ -136,7 +136,7 @@ This is the thickness of the line to be drawn. Defaults to 1 pixel.
 =item * COLOR
 This is the color to draw the line in. Defaults to black.
 
-=back 4
+=back
 
 =head1 CHILDREN
 
